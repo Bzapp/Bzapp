@@ -249,6 +249,25 @@ a {
   gap: 2rem;
 }
 
+.page-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1.6rem;
+  margin: 2.75rem 0 0;
+  padding: 1.15rem 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.page-links a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.page-links a:hover {
+  color: var(--accent);
+}
+
 .eyebrow {
   margin: 0 0 0.85rem;
   color: var(--accent);
