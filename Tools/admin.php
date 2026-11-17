@@ -87,7 +87,7 @@ $users = db()->query('SELECT id, username, role, active, created_at FROM users O
 <header class="site-head">
   <div class="status">
     <div class="status-inner">
-      <p><span class="status-label">MAF</span> <span class="status-hours">Administração</span></p>
+      <p><span class="status-label">Ferramentas de oficina</span></p>
       <p class="status-links"><span><?=h($admin['username'])?> · Admin</span></p>
     </div>
   </div>

@@ -17,7 +17,7 @@ $user = require_login();
 <header class="site-head">
   <div class="status">
     <div class="status-inner">
-      <p><span class="status-label">MAF</span> <span class="status-hours">Ferramentas de oficina</span></p>
+      <p><span class="status-label">Ferramentas de oficina</span></p>
       <p class="status-links">
         <span><?=h($user['username'])?><?= $user['role'] === 'admin' ? ' · Admin' : '' ?></span>
       </p>
