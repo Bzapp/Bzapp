@@ -17,7 +17,7 @@ $user = require_login();
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="app.php" aria-label="BPower Car-Service">
-      <span class="brand-mark"><img src="logo.png" alt="BPower Car-Service"></span>
+      <span class="brand-mark"><img src="logos/branco-horizontal.png" alt="BPower Car-Service"></span>
     </a>
     <div class="top-actions">
       <span class="user-chip">

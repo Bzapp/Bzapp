@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="login-page">
   <main class="login-shell">
     <div class="login-logo-card">
-      <img src="logo.png" alt="BPower Car-Service">
+      <img src="logos/colorido-horizontal.png" alt="BPower Car-Service">
     </div>
     <p class="login-version">Versão 1.0.0</p>
 
