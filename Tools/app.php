@@ -10,23 +10,28 @@ $user = require_login();
 <title>MAF - Conversores</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="app-page">
-<header class="topbar">
-  <div class="topbar-inner">
-    <a class="brand" href="app.php" aria-label="BPower Car-Service">
-      <span class="brand-mark"><img src="logos/branco-horizontal.png" alt="BPower Car-Service"></span>
-    </a>
-    <div class="top-actions">
-      <span class="user-chip">
-        <?=h($user['username'])?>
-        <em><?= $user['role'] === 'admin' ? 'Admin' : 'Utilizador' ?></em>
-      </span>
-      <?php if ($user['role'] === 'admin'): ?><a href="admin.php">Administração</a><?php endif; ?>
-      <a class="logout" href="logout.php">Sair</a>
+<header class="site-head">
+  <div class="status">
+    <div class="status-inner">
+      <p><span class="status-label">MAF</span> <span class="status-hours">Ferramentas de oficina</span></p>
+      <p class="status-links">
+        <span><?=h($user['username'])?><?= $user['role'] === 'admin' ? ' · Admin' : '' ?></span>
+      </p>
     </div>
+  </div>
+  <div class="head-row">
+    <a class="brand" href="app.php">
+      <img src="logos/colorido-horizontal.png" alt="BPower Car-Service" width="946" height="225">
+    </a>
+    <nav class="rednav" aria-label="Aplicação">
+      <a href="app.php" aria-current="page">Conversores</a>
+      <?php if ($user['role'] === 'admin'): ?><a href="admin.php">Administração</a><?php endif; ?>
+      <a class="nav-out" href="logout.php">Sair</a>
+    </nav>
   </div>
 </header>
 <div class="site-area">

@@ -62,24 +62,26 @@ $users = db()->query('SELECT id, username, role, active, created_at FROM users O
 <title>Administração</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="app-page">
-<header class="topbar">
-  <div class="topbar-inner">
-    <a class="brand" href="app.php" aria-label="BPower Car-Service">
-      <span class="brand-mark"><img src="logos/branco-horizontal.png" alt="BPower Car-Service"></span>
-    </a>
-    <div class="top-actions">
-      <span class="user-chip">
-        <?=h($admin['username'])?>
-        <em>Admin</em>
-      </span>
-      <a href="app.php">Conversores</a>
-      <a class="is-active" href="admin.php">Administração</a>
-      <a class="logout" href="logout.php">Sair</a>
+<header class="site-head">
+  <div class="status">
+    <div class="status-inner">
+      <p><span class="status-label">MAF</span> <span class="status-hours">Administração</span></p>
+      <p class="status-links"><span><?=h($admin['username'])?> · Admin</span></p>
     </div>
+  </div>
+  <div class="head-row">
+    <a class="brand" href="app.php">
+      <img src="logos/colorido-horizontal.png" alt="BPower Car-Service" width="946" height="225">
+    </a>
+    <nav class="rednav" aria-label="Aplicação">
+      <a href="app.php">Conversores</a>
+      <a href="admin.php" aria-current="page">Administração</a>
+      <a class="nav-out" href="logout.php">Sair</a>
+    </nav>
   </div>
 </header>
 
