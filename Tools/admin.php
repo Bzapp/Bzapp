@@ -60,12 +60,29 @@ $users = db()->query('SELECT id, username, role, active, created_at FROM users O
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Administração</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="app-page">
 <header class="topbar">
-  <div><strong>BP Power Car Service</strong></div>
-  <div class="top-actions"><a href="app.php">Conversores</a><a href="logout.php">Sair</a></div>
+  <a class="brand" href="app.php">
+    <span class="brand-mark"><img src="logo.png" alt="BPower Car-Service"></span>
+    <span class="brand-text">
+      <strong>BPower Car-Service</strong>
+      <span>MAF · Administração</span>
+    </span>
+  </a>
+  <div class="top-actions">
+    <span class="user-chip">
+      <?=h($admin['username'])?>
+      <em>Admin</em>
+    </span>
+    <a href="app.php">Conversores</a>
+    <a class="is-active" href="admin.php">Administração</a>
+    <a class="logout" href="logout.php">Sair</a>
+  </div>
 </header>
 
 <main class="admin-wrap">
@@ -113,7 +130,7 @@ $users = db()->query('SELECT id, username, role, active, created_at FROM users O
                 <input type="hidden" name="id" value="<?=$u['id']?>">
                 <button type="submit" class="small danger">Eliminar</button>
               </form>
-              <?php else: ?>Atual<?=h('')?>
+              <?php else: ?>Atual
               <?php endif; ?>
             </td>
           </tr>
