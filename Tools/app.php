@@ -15,20 +15,18 @@ $user = require_login();
 </head>
 <body class="app-page">
 <header class="topbar">
-  <a class="brand" href="app.php">
-    <span class="brand-mark"><img src="logo.png" alt="BPower Car-Service"></span>
-    <span class="brand-text">
-      <strong>BPower Car-Service</strong>
-      <span>MAF · Conversores</span>
-    </span>
-  </a>
-  <div class="top-actions">
-    <span class="user-chip">
-      <?=h($user['username'])?>
-      <em><?= $user['role'] === 'admin' ? 'Admin' : 'Utilizador' ?></em>
-    </span>
-    <?php if ($user['role'] === 'admin'): ?><a href="admin.php">Administração</a><?php endif; ?>
-    <a class="logout" href="logout.php">Sair</a>
+  <div class="topbar-inner">
+    <a class="brand" href="app.php" aria-label="BPower Car-Service">
+      <span class="brand-mark"><img src="logo.png" alt="BPower Car-Service"></span>
+    </a>
+    <div class="top-actions">
+      <span class="user-chip">
+        <?=h($user['username'])?>
+        <em><?= $user['role'] === 'admin' ? 'Admin' : 'Utilizador' ?></em>
+      </span>
+      <?php if ($user['role'] === 'admin'): ?><a href="admin.php">Administração</a><?php endif; ?>
+      <a class="logout" href="logout.php">Sair</a>
+    </div>
   </div>
 </header>
 <div class="site-area">

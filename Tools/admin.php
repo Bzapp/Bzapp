@@ -67,21 +67,19 @@ $users = db()->query('SELECT id, username, role, active, created_at FROM users O
 </head>
 <body class="app-page">
 <header class="topbar">
-  <a class="brand" href="app.php">
-    <span class="brand-mark"><img src="logo.png" alt="BPower Car-Service"></span>
-    <span class="brand-text">
-      <strong>BPower Car-Service</strong>
-      <span>MAF · Administração</span>
-    </span>
-  </a>
-  <div class="top-actions">
-    <span class="user-chip">
-      <?=h($admin['username'])?>
-      <em>Admin</em>
-    </span>
-    <a href="app.php">Conversores</a>
-    <a class="is-active" href="admin.php">Administração</a>
-    <a class="logout" href="logout.php">Sair</a>
+  <div class="topbar-inner">
+    <a class="brand" href="app.php" aria-label="BPower Car-Service">
+      <span class="brand-mark"><img src="logo.png" alt="BPower Car-Service"></span>
+    </a>
+    <div class="top-actions">
+      <span class="user-chip">
+        <?=h($admin['username'])?>
+        <em>Admin</em>
+      </span>
+      <a href="app.php">Conversores</a>
+      <a class="is-active" href="admin.php">Administração</a>
+      <a class="logout" href="logout.php">Sair</a>
+    </div>
   </div>
 </header>
 

@@ -6,6 +6,7 @@
   --blue: #087ff0;
   --blue-dark: #066fd2;
   --brand-red: #e10600;
+  --brand-orange: #f0a000;
   --white: #ffffff;
   --shadow: 0 10px 28px rgba(15, 35, 55, 0.12);
   --font: "Manrope", "Segoe UI", sans-serif;
@@ -115,22 +116,25 @@ body {
   min-height: 100vh;
 }
 
-/* —— Header / topbar —— */
+/* —— Header banner (matches B/Power reference) —— */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 20;
-  min-height: 76px;
-  padding: 12px 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  background:
-    linear-gradient(180deg, #101820 0%, #172430 100%);
+  min-height: 96px;
+  padding: 0;
   color: var(--white);
-  box-shadow: var(--shadow);
-  border-bottom: 3px solid var(--brand-red);
+  background-color: var(--brand-red);
+  background-image: url("header-banner.png");
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: auto 100%;
+  border-top: 2px solid #111;
+  border-bottom: 2px solid #111;
+  box-shadow:
+    inset 0 2px 0 var(--brand-orange),
+    inset 0 -2px 0 var(--brand-orange),
+    0 8px 22px rgba(0, 0, 0, 0.22);
   animation: topbar-in 420ms ease-out;
 }
 
@@ -139,63 +143,38 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.brand {
+.topbar-inner {
+  position: relative;
+  z-index: 2;
+  min-height: 96px;
+  padding: 12px 22px 12px 18px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  text-decoration: none;
-  color: inherit;
-  min-width: 0;
+  justify-content: space-between;
+  gap: 18px;
 }
 
-.brand-mark {
-  flex: 0 0 auto;
-  width: 118px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  overflow: hidden;
-}
-
-.brand-mark img {
+.brand {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 4px 6px;
+  width: min(420px, 48vw);
+  height: 72px;
+  text-decoration: none;
+  color: transparent;
+  /* clickable logo zone over the banner artwork */
 }
 
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.brand-text strong {
-  font-family: var(--display);
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  line-height: 1.1;
-}
-
-.brand-text span {
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.brand-mark,
+.brand-mark img {
+  display: none;
 }
 
 .top-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   flex-wrap: wrap;
   justify-content: flex-end;
+  margin-left: auto;
 }
 
 .user-chip {
@@ -203,49 +182,51 @@ body {
   align-items: center;
   gap: 8px;
   padding: 7px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.16);
+  color: #fff;
   font-size: 0.86rem;
+  backdrop-filter: blur(2px);
 }
 
 .user-chip em {
   font-style: normal;
-  color: #9ec8ff;
+  color: #ffe08a;
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .top-actions a {
-  color: rgba(255, 255, 255, 0.9);
+  color: #fff;
   text-decoration: none;
   font-size: 0.9rem;
-  font-weight: 600;
-  padding: 8px 12px;
-  border: 1px solid transparent;
-  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 9px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.14);
+  transition: background 160ms ease, border-color 160ms ease, transform 120ms ease;
 }
 
 .top-actions a:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.28);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .top-actions a.is-active {
-  background: rgba(8, 127, 240, 0.22);
-  border-color: rgba(8, 127, 240, 0.45);
-  color: #fff;
+  background: rgba(0, 0, 0, 0.34);
+  border-color: #ffe08a;
 }
 
 .top-actions a.logout {
-  border-color: rgba(255, 255, 255, 0.2);
-  margin-left: 4px;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.22);
 }
 
 .top-actions a.logout:hover {
-  background: var(--brand-red);
-  border-color: var(--brand-red);
+  background: #111;
+  border-color: #111;
 }
 
 .site-area {
@@ -256,7 +237,7 @@ body {
 .site-area iframe {
   display: block;
   width: 100%;
-  height: calc(100vh - 86px);
+  height: calc(100vh - 106px);
   min-height: 650px;
   border: 0;
 }
@@ -331,21 +312,26 @@ th { background: var(--panel); }
 
 .danger { background: #c93636 !important; }
 
-@media (max-width: 760px) {
-  .create-form { grid-template-columns: 1fr; }
+@media (max-width: 860px) {
   .topbar {
-    padding: 12px 14px;
-    align-items: flex-start;
-    flex-direction: column;
+    background-size: auto 78%;
+    background-position: 8px center;
   }
-  .brand-mark { width: 100px; height: 42px; }
-  .brand-text strong { font-size: 1rem; }
+  .topbar-inner {
+    min-height: 118px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 14px;
+  }
+  .brand {
+    width: min(280px, 70vw);
+    height: 48px;
+  }
   .top-actions {
     width: 100%;
-    gap: 8px;
     justify-content: flex-start;
   }
-  .top-actions a.logout { margin-left: 0; }
+  .create-form { grid-template-columns: 1fr; }
   .site-area iframe {
     height: 750px;
     min-height: 750px;
