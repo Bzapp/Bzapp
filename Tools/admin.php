@@ -50,6 +50,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success = 'Utilizador eliminado.';
         }
     }
+
+    if ($action === 'reset_password') {
+        $id = (int)($_POST['id'] ?? 0);
+        $password = (string)($_POST['password'] ?? '');
+        $exists = db()->prepare('SELECT id, username FROM users WHERE id = ? LIMIT 1');
+        $exists->execute([$id]);
+        $target = $exists->fetch(PDO::FETCH_ASSOC);
+
+        if (!$target) {
+            $error = 'Utilizador não encontrado.';
+        } elseif (strlen($password) < 6) {
+            $error = 'A nova palavra-passe deve ter pelo menos 6 caracteres.';
+        } else {
+            $stmt = db()->prepare('UPDATE users SET password_hash = ? WHERE id = ?');
+            $stmt->execute([password_hash($password, PASSWORD_DEFAULT), $id]);
+            $success = 'Palavra-passe de "' . $target['username'] . '" atualizada.';
+        }
+    }
 }
 
 $users = db()->query('SELECT id, username, role, active, created_at FROM users ORDER BY id DESC')->fetchAll(PDO::FETCH_ASSOC);
@@ -108,14 +126,23 @@ $users = db()->query('SELECT id, username, role, active, created_at FROM users O
       <h2>Utilizadores existentes</h2>
       <div class="table-wrap">
       <table>
-        <thead><tr><th>Utilizador</th><th>Perfil</th><th>Estado</th><th>Criado em</th><th>Ações</th></tr></thead>
+        <thead><tr><th>Utilizador</th><th>Perfil</th><th>Estado</th><th>Criado em</th><th>Nova palavra-passe</th><th>Ações</th></tr></thead>
         <tbody>
         <?php foreach ($users as $u): ?>
           <tr>
-            <td><?=h($u['username'])?></td>
+            <td><?=h($u['username'])?><?php if ((int)$u['id'] === $admin['id']): ?> <span class="you-tag">tu</span><?php endif; ?></td>
             <td><?=h($u['role'])?></td>
             <td><?= $u['active'] ? 'Ativo' : 'Inativo' ?></td>
             <td><?=h($u['created_at'])?></td>
+            <td>
+              <form method="post" class="pass-form" onsubmit="return confirm('Alterar a palavra-passe de <?=h($u['username'])?>?');">
+                <input type="hidden" name="csrf" value="<?=h(csrf_token())?>">
+                <input type="hidden" name="action" value="reset_password">
+                <input type="hidden" name="id" value="<?=$u['id']?>">
+                <input type="password" name="password" placeholder="Nova passe (mín. 6)" minlength="6" required>
+                <button type="submit" class="small">Alterar</button>
+              </form>
+            </td>
             <td class="actions-cell">
               <?php if ((int)$u['id'] !== $admin['id']): ?>
               <form method="post" class="inline">
@@ -130,7 +157,8 @@ $users = db()->query('SELECT id, username, role, active, created_at FROM users O
                 <input type="hidden" name="id" value="<?=$u['id']?>">
                 <button type="submit" class="small danger">Eliminar</button>
               </form>
-              <?php else: ?>Atual
+              <?php else: ?>
+              —
               <?php endif; ?>
             </td>
           </tr>
