@@ -7,6 +7,8 @@ if (current_user()) {
 }
 
 $error = '';
+$users = db()->query('SELECT username FROM users WHERE active = 1 ORDER BY username COLLATE NOCASE')->fetchAll(PDO::FETCH_COLUMN);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     $username = trim((string)($_POST['username'] ?? ''));
@@ -29,24 +31,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Login MAF</title>
+<title>Login MAF · BPower</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="login-page">
-<div class="login-card">
-    <div class="logo-wrap"><img src="logo.png" alt=" BPower Car-Service"></div>
-    <h1>Login MAF</h1>
-    <?php if ($error): ?><div class="error"><?=h($error)?></div><?php endif; ?>
-    <form method="post">
-        <input type="hidden" name="csrf" value="<?=h(csrf_token())?>">
-        <input type="text" name="username" placeholder="Utilizador" autocomplete="username" required>
+  <main class="login-shell">
+    <div class="login-logo-card">
+      <img src="logo.png" alt="BPower Car-Service">
+    </div>
+    <p class="login-version">Versão 1.0.0</p>
+
+    <?php if ($error): ?><div class="error login-error"><?=h($error)?></div><?php endif; ?>
+
+    <form class="login-form" method="post" autocomplete="on">
+      <input type="hidden" name="csrf" value="<?=h(csrf_token())?>">
+
+      <?php if ($users): ?>
+      <label class="login-field">
+        <span class="sr-only">Nome</span>
+        <select name="username" required>
+          <option value="" disabled <?= isset($_POST['username']) ? '' : 'selected' ?>>Nome</option>
+          <?php foreach ($users as $name): ?>
+          <option value="<?=h($name)?>" <?= (($_POST['username'] ?? '') === $name) ? 'selected' : '' ?>><?=h($name)?></option>
+          <?php endforeach; ?>
+        </select>
+      </label>
+      <?php else: ?>
+      <label class="login-field">
+        <span class="sr-only">Nome</span>
+        <input type="text" name="username" placeholder="Nome" autocomplete="username" required value="<?=h((string)($_POST['username'] ?? ''))?>">
+      </label>
+      <?php endif; ?>
+
+      <label class="login-field">
+        <span class="sr-only">Palavra-passe</span>
         <input type="password" name="password" placeholder="Palavra-passe" autocomplete="current-password" required>
-        <button class="login-btn" type="submit">Entrar</button>
+      </label>
+
+      <button class="login-btn" type="submit">ACESSAR</button>
     </form>
-    <div class="copyright">© <?=date('Y')?> BPower Car-Service</div>
-</div>
+  </main>
+
+  <footer class="login-footer"><?=date('Y')?> © BPower Car-Service</footer>
 </body>
 </html>
