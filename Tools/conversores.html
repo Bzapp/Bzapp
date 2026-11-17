@@ -4,37 +4,41 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Conversores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
 <style>
+:root{--ink:#1a1512;--muted:#5e584f;--line:#e2d9cf;--panel:#f6f1ea;--red:#e10600;--red-dark:#c10500;--gold:#f0b429;--charcoal:#141416}
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:#17324a;background:#fff;font-size:14px}
-body{padding:6px 14px 20px}
-.layout{max-width:1090px;margin:0 auto;display:grid;grid-template-columns:193px minmax(0,864px);gap:30px;align-items:start}
-.sidebar{border:1px solid #ddd;border-radius:4px;overflow:hidden;background:#fff}
-.nav{display:flex;align-items:center;min-height:49px;padding:0 20px;border-bottom:1px solid #ddd;color:#31506d;text-decoration:none;font-size:16px;cursor:pointer}
-.nav:last-child{border-bottom:0}.nav.active{background:#087ff0;color:#fff}.nav:hover:not(.active){background:#f5f8fb}
-.panel{width:100%;border:1px solid #ddd;border-radius:4px;overflow:hidden;background:#fff}
-.title{height:49px;display:flex;align-items:center;padding:0 21px;background:#f7f7f7;border-bottom:1px solid #d6d6d6;font-size:16px}
+html,body{margin:0;padding:0;font-family:Manrope,Arial,Helvetica,sans-serif;color:var(--ink);background:#f3efe8;font-size:14px}
+body{padding:10px 14px 20px}
+.layout{max-width:1090px;margin:0 auto;display:grid;grid-template-columns:193px minmax(0,864px);gap:22px;align-items:start}
+.sidebar{border:1px solid var(--line);border-radius:4px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(20,20,22,.05)}
+.nav{display:flex;align-items:center;min-height:49px;padding:0 20px;border-bottom:1px solid var(--line);color:#3a342e;text-decoration:none;font-size:15px;cursor:pointer}
+.nav:last-child{border-bottom:0}.nav.active{background:var(--red);color:#fff}.nav:hover:not(.active){background:#faf6f0}
+.panel{width:100%;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(20,20,22,.05)}
+.title{height:49px;display:flex;align-items:center;padding:0 21px;background:var(--charcoal);border-bottom:3px solid var(--gold);color:#fff;font-size:16px;font-family:Oswald,Arial Narrow,sans-serif;letter-spacing:.06em;text-transform:uppercase}
 .body{padding:25px 20px 19px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
-.lab{margin-bottom:12px}.opts{display:flex;gap:19px;align-items:center;margin-bottom:26px;white-space:nowrap}.opt{display:flex;gap:8px;align-items:center}
-input[type=radio]{appearance:none;width:16px;height:16px;border:1px solid #afbdc9;border-radius:50%;margin:0;background:#fff}
-input[type=radio]:checked{border:5px solid #087ff0}
-.row{display:flex;height:31px}.row input,.inp{width:100%;height:31px;border:1px solid #cbd6df;border-radius:3px;padding:6px 9px;outline:none;background:#fff;color:#17324a;font-size:14px}
-.row input[readonly]{background:#e9eef2}.unit{width:70px;flex:0 0 70px;border:1px solid #cbd6df;border-left:0;border-radius:0 3px 3px 0;background:#e9eef2;display:flex;align-items:center;justify-content:center;font-size:12px}
+.lab{margin-bottom:12px;font-weight:700;color:#2c2621}.opts{display:flex;gap:19px;align-items:center;margin-bottom:26px;white-space:nowrap}.opt{display:flex;gap:8px;align-items:center}
+input[type=radio]{appearance:none;width:16px;height:16px;border:1px solid #b7aea3;border-radius:50%;margin:0;background:#fff}
+input[type=radio]:checked{border:5px solid var(--red)}
+.row{display:flex;height:31px}.row input,.inp{width:100%;height:31px;border:1px solid #d2c8bc;border-radius:3px;padding:6px 9px;outline:none;background:#fff;color:var(--ink);font-size:14px}
+.row input:focus,.inp:focus,.pressure-input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(225,6,0,.15)}
+.row input[readonly]{background:#f3eee7}.unit{width:70px;flex:0 0 70px;border:1px solid #d2c8bc;border-left:0;border-radius:0 3px 3px 0;background:#efe8de;display:flex;align-items:center;justify-content:center;font-size:12px;color:#5e584f}
 .btn{display:flex;justify-content:flex-end;margin-top:16px}
-button{border:0;border-radius:4px;background:#087ff0;color:#fff;padding:10px 16px;font-size:14px;cursor:pointer}button:hover{background:#066fd2}
+button{border:0;border-radius:4px;background:var(--red);color:#fff;padding:10px 16px;font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}button:hover{background:var(--red-dark)}
 
 /* Converter rows */
 .conv-labels,.conv-fields{display:grid;gap:24px}
-.conv-labels{margin-bottom:14px}.conv-fields{background:#f1f1f1;padding:13px 12px 12px}
+.conv-labels{margin-bottom:14px}.conv-fields{background:#f3eee7;padding:13px 12px 12px}
 .c2{grid-template-columns:repeat(2,minmax(0,1fr))}.c3{grid-template-columns:repeat(3,minmax(0,1fr))}.c4{grid-template-columns:repeat(4,minmax(0,1fr))}.c6{grid-template-columns:repeat(6,minmax(0,1fr))}.c7{grid-template-columns:repeat(7,minmax(0,1fr))}.c10{grid-template-columns:repeat(10,minmax(0,1fr))}
 .conv-label{min-height:51px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;line-height:24px;white-space:nowrap}
 
 /* Ensure the pressure converter is always horizontal like the reference */
 .pressure-labels,.pressure-fields{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:24px}
-.pressure-labels{margin-bottom:14px}.pressure-fields{background:#f1f1f1;padding:13px 12px 12px}
+.pressure-labels{margin-bottom:14px}.pressure-fields{background:#f3eee7;padding:13px 12px 12px}
 .pressure-label{min-height:30px;display:flex;align-items:flex-end;justify-content:center;white-space:nowrap}
-.pressure-input{width:100%;height:31px;border:1px solid #cbd6df;border-radius:3px;padding:6px 8px;outline:none;font-size:14px;background:#fff}
+.pressure-input{width:100%;height:31px;border:1px solid #d2c8bc;border-radius:3px;padding:6px 8px;outline:none;font-size:14px;background:#fff}
 
 @media(max-width:760px){
  body{padding:0 8px 12px}.layout{grid-template-columns:1fr;gap:14px}.sidebar{display:flex;overflow:auto}
