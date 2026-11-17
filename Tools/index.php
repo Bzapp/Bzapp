@@ -39,10 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="login-page">
   <main class="login-shell">
-    <div class="login-logo-card">
+    <div class="login-logo">
       <img src="logos/colorido-horizontal.png" alt="BPower Car-Service">
     </div>
-    <p class="login-version">Versão 1.0.0</p>
 
     <?php if ($error): ?><div class="error login-error"><?=h($error)?></div><?php endif; ?>
 

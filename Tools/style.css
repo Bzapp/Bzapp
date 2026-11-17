@@ -53,30 +53,19 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.login-logo-card {
+.login-logo {
   width: 100%;
-  background: #fff;
-  border-radius: 10px;
-  padding: 18px 22px;
   display: grid;
   place-items: center;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  margin-bottom: 28px;
 }
 
-.login-logo-card img {
+.login-logo img {
   display: block;
-  width: min(100%, 220px);
+  width: min(100%, 300px);
   height: auto;
-  max-height: 110px;
+  max-height: 150px;
   object-fit: contain;
-}
-
-.login-version {
-  margin: 18px 0 28px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.92);
 }
 
 .login-form {
