@@ -54,9 +54,17 @@ render_header($user, 'inicio');
   <?php endif; ?>
 
   <div class="brand-grid">
-    <?php foreach ($brands as $brand): ?>
+    <?php foreach ($brands as $brand):
+      $icon = brand_icon_url($brand['slug']);
+    ?>
       <a class="brand-card" href="marca.php?slug=<?=h(urlencode($brand['slug']))?>">
+        <?php if ($icon): ?>
+        <span class="brand-logo">
+          <img src="<?=h($icon)?>" alt="" width="48" height="48" loading="lazy">
+        </span>
+        <?php else: ?>
         <span class="brand-badge" aria-hidden="true"><?=h(strtoupper(substr($brand['name'], 0, 1)))?></span>
+        <?php endif; ?>
         <span class="brand-card-body">
           <strong><?=h($brand['name'])?></strong>
           <em><?= (int)$brand['model_count'] ?> modelo<?= (int)$brand['model_count'] === 1 ? '' : 's' ?></em>

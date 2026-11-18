@@ -610,9 +610,9 @@ td { border-bottom-color: #ebe4da; }
 }
 
 .brand-badge {
-  flex: 0 0 38px;
-  width: 38px;
-  height: 38px;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   border-radius: 8px;
@@ -621,6 +621,25 @@ td { border-bottom-color: #ebe4da; }
   font-family: "Oswald", sans-serif;
   font-weight: 600;
   font-size: 1.05rem;
+}
+
+.brand-logo {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+}
+
+.brand-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .brand-card-body {

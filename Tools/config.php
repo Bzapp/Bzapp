@@ -26,6 +26,7 @@ function db(): PDO {
 }
 
 const MANUALS_DIR = __DIR__ . '/data/manuais';
+const BRAND_ICONS_DIR = __DIR__ . '/icones_marca';
 
 function init_db(): void {
     $pdo = db();
@@ -73,6 +74,7 @@ function init_db(): void {
         )
     ");
     seed_brands();
+    ensure_seed_brands();
 }
 
 function slugify(string $text): string {
@@ -101,11 +103,40 @@ function seed_brands(): void {
         'Isuzu', 'Iveco', 'Jaguar', 'Jeep', 'Kia', 'Lada', 'Lancia', 'Land Rover', 'Lexus',
         'Mazda', 'Mercedes-Benz', 'MG', 'Mini', 'Mitsubishi', 'Nissan', 'Opel', 'Peugeot',
         'Porsche', 'Renault', 'Seat', 'Škoda', 'Smart', 'SsangYong', 'Subaru', 'Suzuki',
-        'Toyota', 'Volkswagen', 'Volvo',
+        'Tesla', 'Toyota', 'Volkswagen', 'Volvo',
     ];
     $stmt = $pdo->prepare('INSERT INTO brands (name, slug, sort_order) VALUES (?, ?, ?)');
     foreach ($names as $i => $name) {
         $stmt->execute([$name, slugify($name), $i + 1]);
+    }
+}
+
+function brand_icon_url(string $slug): ?string {
+    $file = BRAND_ICONS_DIR . '/' . $slug . '.png';
+    if (!is_file($file)) return null;
+    return 'icones_marca/' . rawurlencode($slug) . '.png';
+}
+
+/** Insere marcas novas do seed que ainda não existam (ex. Tesla após update). */
+function ensure_seed_brands(): void {
+    $pdo = db();
+    $names = [
+        'Abarth', 'Alfa Romeo', 'Audi', 'BMW', 'Chevrolet', 'Chrysler', 'Citroën', 'Cupra',
+        'Dacia', 'Daewoo', 'Dodge', 'DS', 'Fiat', 'Ford', 'Ford USA', 'GMC', 'Honda', 'Hyundai',
+        'Isuzu', 'Iveco', 'Jaguar', 'Jeep', 'Kia', 'Lada', 'Lancia', 'Land Rover', 'Lexus',
+        'Mazda', 'Mercedes-Benz', 'MG', 'Mini', 'Mitsubishi', 'Nissan', 'Opel', 'Peugeot',
+        'Porsche', 'Renault', 'Seat', 'Škoda', 'Smart', 'SsangYong', 'Subaru', 'Suzuki',
+        'Tesla', 'Toyota', 'Volkswagen', 'Volvo',
+    ];
+    $check = $pdo->prepare('SELECT id FROM brands WHERE slug = ? LIMIT 1');
+    $insert = $pdo->prepare('INSERT INTO brands (name, slug, sort_order) VALUES (?, ?, ?)');
+    $max = (int)$pdo->query('SELECT COALESCE(MAX(sort_order), 0) FROM brands')->fetchColumn();
+    foreach ($names as $name) {
+        $slug = slugify($name);
+        $check->execute([$slug]);
+        if ($check->fetchColumn()) continue;
+        $max++;
+        $insert->execute([$name, $slug, $max]);
     }
 }
 
