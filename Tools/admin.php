@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/config.php';
+require __DIR__ . '/layout.php';
 $admin = require_admin();
 
 $success = '';
@@ -71,38 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $users = db()->query('SELECT id, username, role, active, created_at FROM users ORDER BY id DESC')->fetchAll(PDO::FETCH_ASSOC);
-?>
-<!doctype html>
-<html lang="pt">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Administração</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-</head>
-<body class="app-page">
-<header class="site-head">
-  <div class="status">
-    <div class="status-inner">
-      <p><span class="status-label">Ferramentas de oficina</span></p>
-      <p class="status-links"><span><?=h($admin['username'])?> · Admin</span></p>
-    </div>
-  </div>
-  <div class="head-row">
-    <a class="brand" href="app.php">
-      <img src="logos/colorido-horizontal.png" alt="BPower Car-Service" width="946" height="225">
-    </a>
-    <nav class="rednav" aria-label="Aplicação">
-      <a href="app.php">Conversores</a>
-      <a href="admin.php" aria-current="page">Administração</a>
-      <a class="nav-out" href="logout.php">Sair</a>
-    </nav>
-  </div>
-</header>
 
+render_head('Administração');
+render_header($admin, 'admin');
+?>
 <main class="admin-wrap">
   <section class="admin-card">
     <div class="admin-title">Administração de utilizadores</div>
@@ -169,5 +142,4 @@ $users = db()->query('SELECT id, username, role, active, created_at FROM users O
     </div>
   </section>
 </main>
-</body>
-</html>
+<?php render_foot(); ?>

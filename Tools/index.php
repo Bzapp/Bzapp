@@ -2,7 +2,7 @@
 require __DIR__ . '/config.php';
 
 if (current_user()) {
-    header('Location: app.php');
+    header('Location: inicio.php');
     exit;
 }
 
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && password_verify($password, $user['password_hash'])) {
         login_user($user);
-        header('Location: app.php');
+        header('Location: inicio.php');
         exit;
     }
     $error = 'Utilizador ou palavra-passe incorretos.';

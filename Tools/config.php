@@ -25,6 +25,8 @@ function db(): PDO {
     return $pdo;
 }
 
+const MANUALS_DIR = __DIR__ . '/data/manuais';
+
 function init_db(): void {
     $pdo = db();
     $pdo->exec("
@@ -37,6 +39,107 @@ function init_db(): void {
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     ");
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS brands (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            slug TEXT NOT NULL UNIQUE,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS models (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            brand_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            slug TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(brand_id, slug),
+            FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE CASCADE
+        )
+    ");
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS manuals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            model_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            stored_name TEXT NOT NULL,
+            original_name TEXT NOT NULL,
+            uploaded_by INTEGER,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (model_id) REFERENCES models(id) ON DELETE CASCADE,
+            FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE SET NULL
+        )
+    ");
+    seed_brands();
+}
+
+function slugify(string $text): string {
+    if (function_exists('iconv')) {
+        $converted = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+        if ($converted !== false) $text = $converted;
+    }
+    $map = [
+        'Á'=>'A','À'=>'A','Ã'=>'A','Â'=>'A','Ä'=>'A','É'=>'E','Ê'=>'E','Í'=>'I','Ó'=>'O','Ô'=>'O','Õ'=>'O','Ö'=>'O','Ú'=>'U','Ü'=>'U','Ç'=>'C','Ñ'=>'N','Š'=>'S',
+        'á'=>'a','à'=>'a','ã'=>'a','â'=>'a','ä'=>'a','é'=>'e','ê'=>'e','í'=>'i','ó'=>'o','ô'=>'o','õ'=>'o','ö'=>'o','ú'=>'u','ü'=>'u','ç'=>'c','ñ'=>'n','š'=>'s',
+    ];
+    $text = strtr($text, $map);
+    $text = strtolower($text);
+    $text = preg_replace('/[^a-z0-9]+/', '-', $text) ?? '';
+    return trim($text, '-') ?: 'item';
+}
+
+function seed_brands(): void {
+    $pdo = db();
+    $count = (int)$pdo->query('SELECT COUNT(*) FROM brands')->fetchColumn();
+    if ($count > 0) return;
+
+    $names = [
+        'Abarth', 'Alfa Romeo', 'Audi', 'BMW', 'Chevrolet', 'Chrysler', 'Citroën', 'Cupra',
+        'Dacia', 'Daewoo', 'Dodge', 'DS', 'Fiat', 'Ford', 'Ford USA', 'GMC', 'Honda', 'Hyundai',
+        'Isuzu', 'Iveco', 'Jaguar', 'Jeep', 'Kia', 'Lada', 'Lancia', 'Land Rover', 'Lexus',
+        'Mazda', 'Mercedes-Benz', 'MG', 'Mini', 'Mitsubishi', 'Nissan', 'Opel', 'Peugeot',
+        'Porsche', 'Renault', 'Seat', 'Škoda', 'Smart', 'SsangYong', 'Subaru', 'Suzuki',
+        'Toyota', 'Volkswagen', 'Volvo',
+    ];
+    $stmt = $pdo->prepare('INSERT INTO brands (name, slug, sort_order) VALUES (?, ?, ?)');
+    foreach ($names as $i => $name) {
+        $stmt->execute([$name, slugify($name), $i + 1]);
+    }
+}
+
+function brand_by_slug(string $slug): ?array {
+    $stmt = db()->prepare('SELECT * FROM brands WHERE slug = ? LIMIT 1');
+    $stmt->execute([$slug]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ?: null;
+}
+
+function model_by_slugs(string $brandSlug, string $modelSlug): ?array {
+    $stmt = db()->prepare(
+        'SELECT m.*, b.name AS brand_name, b.slug AS brand_slug
+         FROM models m
+         JOIN brands b ON b.id = m.brand_id
+         WHERE b.slug = ? AND m.slug = ?
+         LIMIT 1'
+    );
+    $stmt->execute([$brandSlug, $modelSlug]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ?: null;
+}
+
+function manuals_dir_for(array $model): string {
+    $dir = MANUALS_DIR . '/' . $model['brand_slug'] . '/' . $model['slug'];
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+    return $dir;
+}
+
+function is_admin_user(?array $user = null): bool {
+    $user = $user ?? current_user();
+    return $user && $user['role'] === 'admin';
 }
 
 function csrf_token(): string {
