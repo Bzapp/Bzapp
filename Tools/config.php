@@ -117,6 +117,14 @@ function brand_icon_url(string $slug): ?string {
     return 'icones_marca/' . rawurlencode($slug) . '.png';
 }
 
+/** Ordenação A–Z ignorando acentos (Škoda com os S, Citroën com os C, etc.). */
+function sort_brands_alpha(array $brands): array {
+    usort($brands, static function (array $a, array $b): int {
+        return strcmp(slugify((string)$a['name']), slugify((string)$b['name']));
+    });
+    return $brands;
+}
+
 /** Insere marcas novas do seed que ainda não existam (ex. Tesla após update). */
 function ensure_seed_brands(): void {
     $pdo = db();

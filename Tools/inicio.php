@@ -27,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_admin_user($user)) {
     }
 }
 
-$brands = db()->query('SELECT b.*, (SELECT COUNT(*) FROM models m WHERE m.brand_id = b.id) AS model_count FROM brands b ORDER BY b.sort_order, b.name')->fetchAll(PDO::FETCH_ASSOC);
+$brands = db()->query('SELECT b.*, (SELECT COUNT(*) FROM models m WHERE m.brand_id = b.id) AS model_count FROM brands b')->fetchAll(PDO::FETCH_ASSOC);
+$brands = sort_brands_alpha($brands);
 
 render_head('Início · Manuais');
 render_header($user, 'inicio');
