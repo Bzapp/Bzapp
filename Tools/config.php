@@ -138,21 +138,23 @@ function seed_brands(): void {
     }
 }
 
-function brand_icon_url(string $slug): ?string {
+function brand_icon_file(string $slug): ?string {
     $file = BRAND_ICONS_DIR . '/' . $slug . '.png';
-    if (!is_file($file)) {
-        // Alguns FTP/Windows alteram maiúsculas; no Linux o nome tem de bater certo.
-        foreach (glob(BRAND_ICONS_DIR . '/*.png') ?: [] as $path) {
-            if (strtolower(basename($path, '.png')) === strtolower($slug)) {
-                $file = $path;
-                $slug = basename($path, '.png');
-                break;
-            }
+    if (is_file($file)) return $file;
+    foreach (glob(BRAND_ICONS_DIR . '/*.png') ?: [] as $path) {
+        if (strtolower(basename($path, '.png')) === strtolower($slug)) {
+            return $path;
         }
     }
-    if (!is_file($file)) return null;
+    return null;
+}
+
+function brand_icon_url(string $slug): ?string {
+    $file = brand_icon_file($slug);
+    if ($file === null) return null;
     $ver = (string)(@filemtime($file) ?: 0);
-    return 'icones_marca/' . rawurlencode($slug) . '.png?v=' . rawurlencode($ver);
+    // Via PHP: contorna cache estática / FTP / case no hosting
+    return 'icon.php?slug=' . rawurlencode($slug) . '&v=' . rawurlencode($ver);
 }
 
 /** Inicial da marca sem partir UTF-8 (Škoda → S). */
