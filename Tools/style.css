@@ -629,16 +629,9 @@ td { border-bottom-color: #ebe4da; }
   height: 56px;
   display: grid;
   place-items: center;
-  border-radius: 0;
-  overflow: visible;
+  border-radius: 8px;
+  overflow: hidden;
   background: transparent;
-}
-
-.brand-logo img {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-  display: block;
 }
 
 .brand-card-body {

@@ -130,6 +130,11 @@ function brand_icon_url(string $slug): ?string {
     return 'icones_marca/' . rawurlencode($slug) . '.png';
 }
 
+function brand_has_sprite(string $slug): bool {
+    // Ícones individuais existem e estão no sprite.css
+    return is_file(BRAND_ICONS_DIR . '/' . $slug . '.png');
+}
+
 /** Ordenação A–Z ignorando acentos (Škoda com os S, Citroën com os C, etc.). */
 function sort_brands_alpha(array $brands): array {
     usort($brands, static function (array $a, array $b): int {

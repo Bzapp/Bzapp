@@ -1,0 +1,57 @@
+/* Gerado automaticamente — sprite das marcas (1 pedido ~46 KB) */
+.brand-logo--sprite {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  border-radius: 8px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-image: url("sprite.webp");
+  background-size: 504px 280px;
+}
+
+.brand-logo--abarth { background-position: -0px -0px; }
+.brand-logo--alfa-romeo { background-position: -56px -0px; }
+.brand-logo--audi { background-position: -112px -0px; }
+.brand-logo--bmw { background-position: -168px -0px; }
+.brand-logo--chevrolet { background-position: -224px -0px; }
+.brand-logo--chrysler { background-position: -280px -0px; }
+.brand-logo--citroen { background-position: -336px -0px; }
+.brand-logo--cupra { background-position: -392px -0px; }
+.brand-logo--dacia { background-position: -448px -0px; }
+.brand-logo--daewoo { background-position: -0px -56px; }
+.brand-logo--ds { background-position: -56px -56px; }
+.brand-logo--fiat { background-position: -112px -56px; }
+.brand-logo--ford-usa { background-position: -168px -56px; }
+.brand-logo--ford { background-position: -224px -56px; }
+.brand-logo--honda { background-position: -280px -56px; }
+.brand-logo--hyundai { background-position: -336px -56px; }
+.brand-logo--isuzu { background-position: -392px -56px; }
+.brand-logo--iveco { background-position: -448px -56px; }
+.brand-logo--jaguar { background-position: -0px -112px; }
+.brand-logo--jeep { background-position: -56px -112px; }
+.brand-logo--kia { background-position: -112px -112px; }
+.brand-logo--lada { background-position: -168px -112px; }
+.brand-logo--lancia { background-position: -224px -112px; }
+.brand-logo--land-rover { background-position: -280px -112px; }
+.brand-logo--lexus { background-position: -336px -112px; }
+.brand-logo--mazda { background-position: -392px -112px; }
+.brand-logo--mercedes-benz { background-position: -448px -112px; }
+.brand-logo--mg { background-position: -0px -168px; }
+.brand-logo--mini { background-position: -56px -168px; }
+.brand-logo--mitsubishi { background-position: -112px -168px; }
+.brand-logo--nissan { background-position: -168px -168px; }
+.brand-logo--opel { background-position: -224px -168px; }
+.brand-logo--peugeot { background-position: -280px -168px; }
+.brand-logo--porsche { background-position: -336px -168px; }
+.brand-logo--renault { background-position: -392px -168px; }
+.brand-logo--seat { background-position: -448px -168px; }
+.brand-logo--skoda { background-position: -0px -224px; }
+.brand-logo--smart { background-position: -56px -224px; }
+.brand-logo--ssangyong { background-position: -112px -224px; }
+.brand-logo--subaru { background-position: -168px -224px; }
+.brand-logo--suzuki { background-position: -224px -224px; }
+.brand-logo--tesla { background-position: -280px -224px; }
+.brand-logo--toyota { background-position: -336px -224px; }
+.brand-logo--volkswagen { background-position: -392px -224px; }
+.brand-logo--volvo { background-position: -448px -224px; }
