@@ -13,10 +13,35 @@ try {
     $bootError = $e->getMessage();
 }
 
+if ($bootError === '' && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'reset_db') {
+    try {
+        verify_csrf();
+        // Apaga só utilizadores (mantém marcas/modelos/PDFs). Evita lock do ficheiro SQLite no Windows.
+        db()->exec('DELETE FROM users');
+        header('Location: setup.php?reset=1');
+        exit;
+    } catch (Throwable $e) {
+        $error = $e->getMessage();
+    }
+}
+
 if ($bootError === '') {
-    if ($count > 0) {
-        $message = 'A instalação já foi concluída. Entra em index.php (login). Se esqueceste a palavra-passe, apaga o ficheiro data/app.sqlite e volta a abrir setup.php para criar um admin novo.';
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $count = (int)db()->query('SELECT COUNT(*) FROM users')->fetchColumn();
+    } catch (Throwable $e) {
+        $bootError = $e->getMessage();
+    }
+}
+
+if ($bootError === '') {
+    if (isset($_GET['reset'])) {
+        $message = 'Base de utilizadores reiniciada. Cria agora o administrador.';
+        $count = 0;
+    }
+
+    if ($count > 0 && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && !isset($_GET['reset'])) {
+        $message = 'A instalação já foi concluída. Entra no login. Se esqueceste a palavra-passe, usa “Recriar instalação” em baixo.';
+    } elseif ($count === 0 && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'reset_db') {
         try {
             verify_csrf();
             $username = trim((string)($_POST['username'] ?? ''));
@@ -30,7 +55,7 @@ if ($bootError === '') {
                 $stmt = db()->prepare('INSERT INTO users (username,password_hash,role) VALUES (?,?,?)');
                 $stmt->execute([$username, password_hash($password, PASSWORD_DEFAULT), 'admin']);
                 $count = 1;
-                $message = 'Administrador criado. Apaga setup.php e entra em index.php.';
+                $message = 'Administrador criado. Entra em index.php. Em produção, apaga setup.php.';
             }
         } catch (Throwable $e) {
             $error = $e->getMessage();
@@ -58,10 +83,9 @@ function setup_h(string $value): string {
 <?php if ($bootError): ?>
 <div class="error">
   <strong>Erro ao iniciar:</strong> <?=setup_h($bootError)?><br><br>
-  Checklist rápido:<br>
-  1) Corre com PHP (não abras o ficheiro só no Explorer)<br>
-  &nbsp;&nbsp;<code>php -S localhost:8080 router.php</code><br>
-  2) A pasta <code>Tools/data</code> tem de existir e ser gravável<br>
+  Checklist:<br>
+  1) Duplo-clique em <code>start.bat</code> (não abras o .php no Explorer)<br>
+  2) Pasta <code>Tools\data</code> tem de ser gravável<br>
   3) PHP com extensão <code>pdo_sqlite</code>
 </div>
 <?php else: ?>
@@ -78,6 +102,11 @@ function setup_h(string $value): string {
 </form>
 <?php else: ?>
 <p style="margin-top:1rem"><a class="login-btn" href="index.php" style="display:inline-block;text-align:center;text-decoration:none">Ir para o login</a></p>
+<form method="post" style="margin-top:1rem" onsubmit="return confirm('Apagar utilizadores e recriar instalação? Os PDFs mantêm-se.');">
+<input type="hidden" name="csrf" value="<?=setup_h(csrf_token())?>">
+<input type="hidden" name="action" value="reset_db">
+<button type="submit" style="background:#444">Recriar instalação</button>
+</form>
 <?php endif; ?>
 
 <?php endif; ?>
