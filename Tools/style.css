@@ -677,7 +677,7 @@ td { border-bottom-color: #ebe4da; }
 
 .folder-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 0.85rem;
 }
 
@@ -693,9 +693,10 @@ td { border-bottom-color: #ebe4da; }
 
 .folder-main {
   display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.85rem 1rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.55rem;
+  padding: 0;
   text-decoration: none;
   color: inherit;
 }
@@ -703,10 +704,9 @@ td { border-bottom-color: #ebe4da; }
 .folder-main:hover { background: #fafbfc; }
 
 .folder-photo {
-  flex: 0 0 112px;
-  width: 112px;
-  height: 72px;
-  border-radius: 6px;
+  width: 100%;
+  height: 132px;
+  border-radius: 0;
   overflow: hidden;
   background: #eef1f5;
   display: grid;
@@ -724,21 +724,25 @@ td { border-bottom-color: #ebe4da; }
   background: linear-gradient(145deg, #2c3340, #1a1f28);
   color: var(--brand-gold);
   font-family: "Oswald", sans-serif;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: 600;
+}
+
+.folder-main > span:not(.folder-photo) {
+  padding: 0 0.75rem 0.15rem;
 }
 
 .folder-main strong {
   display: block;
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   color: #1d2430;
 }
 
 .folder-main em {
   display: block;
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
   font-style: normal;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   color: #8a93a3;
 }
 
@@ -746,24 +750,31 @@ td { border-bottom-color: #ebe4da; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0 0.85rem 0.75rem;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem 0.55rem;
 }
 
 .folder-delete { margin: 0; }
 
 .folder-image-form { margin: 0; }
 
+.folder-actions .small {
+  height: 24px !important;
+  padding: 0 8px !important;
+  font-size: 11px !important;
+  line-height: 1;
+}
+
 .small-file {
   position: relative;
   display: inline-flex;
   align-items: center;
-  height: 31px;
-  padding: 0 10px;
+  height: 24px;
+  padding: 0 8px;
   border-radius: 4px;
   background: #2c3340;
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   overflow: hidden;

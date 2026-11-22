@@ -145,7 +145,7 @@ render_header($user, 'inicio');
         <a class="folder-main" href="modelo.php?marca=<?=h(urlencode($brand['slug']))?>&modelo=<?=h(urlencode($model['slug']))?>">
           <?php if ($imgUrl): ?>
           <span class="folder-photo">
-            <img src="<?=h($imgUrl)?>" alt="" width="120" height="80" loading="lazy">
+            <img src="<?=h($imgUrl)?>" alt="" width="320" height="180" loading="lazy">
           </span>
           <?php else: ?>
           <span class="folder-photo folder-photo--empty" aria-hidden="true">
