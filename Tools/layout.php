@@ -13,6 +13,7 @@ function render_head(string $title): void {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="preload" href="logos/colorido-horizontal.png" as="image">
 </head>
 <body class="app-page">
     <?php
@@ -31,7 +32,7 @@ function render_header(array $user, string $active = 'inicio'): void {
   </div>
   <div class="head-row">
     <a class="brand" href="inicio.php">
-      <img src="logos/colorido-horizontal.png" alt="BPower Car-Service" width="946" height="225">
+      <img src="logos/colorido-horizontal.png" alt="BPower Car-Service" width="946" height="225" decoding="async">
     </a>
     <nav class="rednav" aria-label="Aplicação">
       <a href="inicio.php"<?= $active === 'inicio' ? ' aria-current="page"' : '' ?>>Início</a>
