@@ -141,7 +141,8 @@ function seed_brands(): void {
 function brand_icon_url(string $slug): ?string {
     $file = BRAND_ICONS_DIR . '/' . $slug . '.png';
     if (!is_file($file)) return null;
-    return 'icones_marca/' . rawurlencode($slug) . '.png';
+    $ver = (string)(@filemtime($file) ?: 0);
+    return 'icones_marca/' . rawurlencode($slug) . '.png?v=' . rawurlencode($ver);
 }
 
 /** Ordenação A–Z ignorando acentos (Škoda com os S, Citroën com os C, etc.). */
