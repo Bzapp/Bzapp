@@ -7,7 +7,6 @@ if (current_user()) {
 }
 
 $error = '';
-$users = db()->query('SELECT username FROM users WHERE active = 1 ORDER BY username COLLATE NOCASE')->fetchAll(PDO::FETCH_COLUMN);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -48,22 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form class="login-form" method="post" autocomplete="on">
       <input type="hidden" name="csrf" value="<?=h(csrf_token())?>">
 
-      <?php if ($users): ?>
-      <label class="login-field">
-        <span class="sr-only">Nome</span>
-        <select name="username" required>
-          <option value="" disabled <?= isset($_POST['username']) ? '' : 'selected' ?>>Nome</option>
-          <?php foreach ($users as $name): ?>
-          <option value="<?=h($name)?>" <?= (($_POST['username'] ?? '') === $name) ? 'selected' : '' ?>><?=h($name)?></option>
-          <?php endforeach; ?>
-        </select>
-      </label>
-      <?php else: ?>
       <label class="login-field">
         <span class="sr-only">Nome</span>
         <input type="text" name="username" placeholder="Nome" autocomplete="username" required value="<?=h((string)($_POST['username'] ?? ''))?>">
       </label>
-      <?php endif; ?>
 
       <label class="login-field">
         <span class="sr-only">Palavra-passe</span>
