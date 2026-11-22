@@ -140,9 +140,26 @@ function seed_brands(): void {
 
 function brand_icon_url(string $slug): ?string {
     $file = BRAND_ICONS_DIR . '/' . $slug . '.png';
+    if (!is_file($file)) {
+        // Alguns FTP/Windows alteram maiúsculas; no Linux o nome tem de bater certo.
+        foreach (glob(BRAND_ICONS_DIR . '/*.png') ?: [] as $path) {
+            if (strtolower(basename($path, '.png')) === strtolower($slug)) {
+                $file = $path;
+                $slug = basename($path, '.png');
+                break;
+            }
+        }
+    }
     if (!is_file($file)) return null;
     $ver = (string)(@filemtime($file) ?: 0);
     return 'icones_marca/' . rawurlencode($slug) . '.png?v=' . rawurlencode($ver);
+}
+
+/** Inicial da marca sem partir UTF-8 (Škoda → S). */
+function brand_initial(string $name): string {
+    $slug = slugify($name);
+    $ch = $slug !== '' ? $slug[0] : '?';
+    return strtoupper($ch);
 }
 
 /** Ordenação A–Z ignorando acentos (Škoda com os S, Citroën com os C, etc.). */

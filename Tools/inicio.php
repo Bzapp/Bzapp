@@ -61,10 +61,10 @@ render_header($user, 'inicio');
       <a class="brand-card" href="marca.php?slug=<?=h(urlencode($brand['slug']))?>">
         <?php if ($icon): ?>
         <span class="brand-logo">
-          <img src="<?=h($icon)?>" alt="<?=h($brand['name'])?>" width="48" height="48" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'brand-badge',textContent:'<?=h(strtoupper(substr($brand['name'], 0, 1)))?>'}))">
+          <img src="<?=h($icon)?>" alt="<?=h($brand['name'])?>" width="48" height="48" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'brand-badge',textContent:'<?=h(brand_initial($brand['name']))?>'}))">
         </span>
         <?php else: ?>
-        <span class="brand-badge" aria-hidden="true"><?=h(strtoupper(substr($brand['name'], 0, 1)))?></span>
+        <span class="brand-badge" aria-hidden="true"><?=h(brand_initial($brand['name']))?></span>
         <?php endif; ?>
         <span class="brand-card-body">
           <strong><?=h($brand['name'])?></strong>
