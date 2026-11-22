@@ -830,10 +830,15 @@ td { border-bottom-color: #ebe4da; }
 }
 
 .manuals-list {
+  display: flex;
+  flex-direction: column;
   padding: 0.85rem 0.7rem;
+  max-height: calc(100vh - 210px);
+  overflow: hidden;
 }
 
 .manuals-list h2 {
+  flex: 0 0 auto;
   margin: 0 0.3rem 0.65rem;
   font-family: "Oswald", sans-serif;
   font-size: 0.95rem;
@@ -845,9 +850,13 @@ td { border-bottom-color: #ebe4da; }
 .manuals-list ul {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0.15rem 0.25rem 0;
   display: grid;
   gap: 0.35rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .manuals-list li {
@@ -865,6 +874,7 @@ td { border-bottom-color: #ebe4da; }
 .manuals-list li a {
   flex: 1;
   min-width: 0;
+  max-height: 7.2em;
   padding: 0.55rem 0.55rem;
   border-radius: 6px;
   text-decoration: none;
@@ -875,10 +885,9 @@ td { border-bottom-color: #ebe4da; }
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .manuals-list li a:hover { background: #f7f8fb; }
@@ -886,6 +895,10 @@ td { border-bottom-color: #ebe4da; }
 .manuals-list li .inline {
   flex: 0 0 auto;
   margin-top: 0.35rem;
+}
+
+.manuals-list .icon-btn {
+  flex: 0 0 auto;
 }
 
 .manuals-viewer {

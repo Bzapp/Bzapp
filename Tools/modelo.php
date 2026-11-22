@@ -132,7 +132,16 @@ render_header($user, 'inicio');
               <input type="hidden" name="csrf" value="<?=h(csrf_token())?>">
               <input type="hidden" name="action" value="delete_pdf">
               <input type="hidden" name="manual_id" value="<?=(int)$m['id']?>">
-              <button type="submit" class="small danger">Eliminar</button>
+              <button type="submit" class="icon-btn icon-btn--danger" title="Eliminar">
+                <span class="sr-only">Eliminar</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"/>
+                  <path d="M8 6V4h8v2"/>
+                  <path d="M19 6l-1 14H6L5 6"/>
+                  <path d="M10 11v6"/>
+                  <path d="M14 11v6"/>
+                </svg>
+              </button>
             </form>
             <?php endif; ?>
           </li>
