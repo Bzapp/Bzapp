@@ -25,11 +25,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_admin_user($user)) {
             try {
                 $stmt = db()->prepare('INSERT INTO models (brand_id, name, slug) VALUES (?, ?, ?)');
                 $stmt->execute([(int)$brand['id'], $name, $modelSlug]);
+                $modelId = (int)db()->lastInsertId();
+                $model = [
+                    'id' => $modelId,
+                    'slug' => $modelSlug,
+                    'brand_slug' => $brand['slug'],
+                    'image_name' => null,
+                ];
                 $dir = MANUALS_DIR . '/' . $brand['slug'] . '/' . $modelSlug;
                 if (!is_dir($dir)) mkdir($dir, 0755, true);
-                $success = 'Pasta do modelo criada.';
+
+                $imgErr = null;
+                if (!empty($_FILES['image']) && ($_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+                    $stored = save_model_image($model, $_FILES['image'], $imgErr);
+                    if ($stored) {
+                        db()->prepare('UPDATE models SET image_name = ? WHERE id = ?')->execute([$stored, $modelId]);
+                        $success = 'Modelo criado com imagem.';
+                    } else {
+                        $success = 'Modelo criado.';
+                        $error = $imgErr ?: 'Não foi possível guardar a imagem.';
+                    }
+                } else {
+                    $success = 'Modelo criado. Podes adicionar a imagem depois.';
+                }
             } catch (PDOException $e) {
                 $error = $e->getCode() === '23000' ? 'Esse modelo já existe nesta marca.' : 'Não foi possível criar o modelo.';
+            }
+        }
+    }
+    if ($action === 'set_model_image') {
+        $modelId = (int)($_POST['model_id'] ?? 0);
+        $stmt = db()->prepare(
+            'SELECT m.*, b.slug AS brand_slug FROM models m
+             JOIN brands b ON b.id = m.brand_id
+             WHERE m.id = ? AND m.brand_id = ?'
+        );
+        $stmt->execute([$modelId, (int)$brand['id']]);
+        $model = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$model) {
+            $error = 'Modelo não encontrado.';
+        } else {
+            $imgErr = null;
+            $stored = save_model_image($model, $_FILES['image'] ?? [], $imgErr);
+            if ($stored) {
+                db()->prepare('UPDATE models SET image_name = ? WHERE id = ?')->execute([$stored, $modelId]);
+                $success = 'Imagem do modelo atualizada.';
+            } else {
+                $error = $imgErr ?: 'Não foi possível guardar a imagem.';
             }
         }
     }
@@ -45,6 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_admin_user($user)) {
                 $path = MANUALS_DIR . '/' . $model['brand_slug'] . '/' . $model['slug'] . '/' . $file;
                 if (is_file($path)) @unlink($path);
             }
+            if (!empty($model['image_name'])) {
+                $img = MANUALS_DIR . '/' . $model['brand_slug'] . '/' . $model['slug'] . '/' . $model['image_name'];
+                if (is_file($img)) @unlink($img);
+            }
             db()->prepare('DELETE FROM manuals WHERE model_id = ?')->execute([$modelId]);
             db()->prepare('DELETE FROM models WHERE id = ?')->execute([$modelId]);
             $success = 'Modelo eliminado.';
@@ -58,6 +104,10 @@ $models = db()->prepare(
 );
 $models->execute([(int)$brand['id']]);
 $models = $models->fetchAll(PDO::FETCH_ASSOC);
+foreach ($models as &$m) {
+    $m['brand_slug'] = $brand['slug'];
+}
+unset($m);
 
 render_head($brand['name'] . ' · Modelos');
 render_header($user, 'inicio');
@@ -67,7 +117,7 @@ render_header($user, 'inicio');
     <div>
       <p class="eyebrow"><a href="inicio.php">Marcas</a> / <?=h($brand['name'])?></p>
       <h1><?=h($brand['name'])?></h1>
-      <p class="page-lead">Pastas de modelos com manuais em PDF.</p>
+      <p class="page-lead">Modelos com manuais em PDF<?= is_admin_user($user) ? ' — adiciona a foto de cada modelo.' : '.' ?></p>
     </div>
   </section>
 
@@ -75,34 +125,56 @@ render_header($user, 'inicio');
   <?php if ($error): ?><div class="error"><?=h($error)?></div><?php endif; ?>
 
   <?php if (is_admin_user($user)): ?>
-  <form class="admin-inline-form" method="post">
+  <form class="admin-inline-form upload-form" method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf" value="<?=h(csrf_token())?>">
     <input type="hidden" name="action" value="create_model">
     <input type="text" name="name" placeholder="Novo modelo (ex. Golf VIII)" required>
-    <button type="submit">Criar pasta</button>
+    <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif">
+    <button type="submit">Criar modelo</button>
   </form>
   <?php endif; ?>
 
   <?php if (!$models): ?>
-    <div class="empty-state">Ainda não há modelos nesta marca.<?php if (is_admin_user($user)): ?> Cria a primeira pasta acima.<?php endif; ?></div>
+    <div class="empty-state">Ainda não há modelos nesta marca.<?php if (is_admin_user($user)): ?> Cria o primeiro acima.<?php endif; ?></div>
   <?php else: ?>
   <div class="folder-grid">
-    <?php foreach ($models as $model): ?>
+    <?php foreach ($models as $model):
+      $imgUrl = model_image_url($model);
+    ?>
       <article class="folder-card">
         <a class="folder-main" href="modelo.php?marca=<?=h(urlencode($brand['slug']))?>&modelo=<?=h(urlencode($model['slug']))?>">
-          <span class="folder-icon" aria-hidden="true"></span>
+          <?php if ($imgUrl): ?>
+          <span class="folder-photo">
+            <img src="<?=h($imgUrl)?>" alt="" width="120" height="80" loading="lazy">
+          </span>
+          <?php else: ?>
+          <span class="folder-photo folder-photo--empty" aria-hidden="true">
+            <span><?=h(strtoupper(substr($model['name'], 0, 1)))?></span>
+          </span>
+          <?php endif; ?>
           <span>
             <strong><?=h($model['name'])?></strong>
             <em><?= (int)$model['pdf_count'] ?> PDF<?= (int)$model['pdf_count'] === 1 ? '' : 's' ?></em>
           </span>
         </a>
         <?php if (is_admin_user($user)): ?>
-        <form method="post" class="folder-delete" onsubmit="return confirm('Eliminar o modelo e todos os PDFs?');">
-          <input type="hidden" name="csrf" value="<?=h(csrf_token())?>">
-          <input type="hidden" name="action" value="delete_model">
-          <input type="hidden" name="model_id" value="<?=(int)$model['id']?>">
-          <button type="submit" class="small danger">Eliminar</button>
-        </form>
+        <div class="folder-actions">
+          <form method="post" enctype="multipart/form-data" class="folder-image-form">
+            <input type="hidden" name="csrf" value="<?=h(csrf_token())?>">
+            <input type="hidden" name="action" value="set_model_image">
+            <input type="hidden" name="model_id" value="<?=(int)$model['id']?>">
+            <label class="small-file">
+              <span><?= $imgUrl ? 'Trocar foto' : 'Adicionar foto' ?></span>
+              <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif" required onchange="this.form.submit()">
+            </label>
+          </form>
+          <form method="post" class="folder-delete" onsubmit="return confirm('Eliminar o modelo e todos os PDFs?');">
+            <input type="hidden" name="csrf" value="<?=h(csrf_token())?>">
+            <input type="hidden" name="action" value="delete_model">
+            <input type="hidden" name="model_id" value="<?=(int)$model['id']?>">
+            <button type="submit" class="small danger">Eliminar</button>
+          </form>
+        </div>
         <?php endif; ?>
       </article>
     <?php endforeach; ?>

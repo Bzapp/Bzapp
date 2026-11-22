@@ -55,11 +55,24 @@ function init_db(): void {
             brand_id INTEGER NOT NULL,
             name TEXT NOT NULL,
             slug TEXT NOT NULL,
+            image_name TEXT,
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(brand_id, slug),
             FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE CASCADE
         )
     ");
+    // Bases já criadas antes desta coluna
+    $cols = $pdo->query('PRAGMA table_info(models)')->fetchAll(PDO::FETCH_ASSOC);
+    $hasImage = false;
+    foreach ($cols as $col) {
+        if (($col['name'] ?? '') === 'image_name') {
+            $hasImage = true;
+            break;
+        }
+    }
+    if (!$hasImage) {
+        $pdo->exec('ALTER TABLE models ADD COLUMN image_name TEXT');
+    }
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS manuals (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -174,6 +187,66 @@ function manuals_dir_for(array $model): string {
         mkdir($dir, 0755, true);
     }
     return $dir;
+}
+
+function model_image_path(array $model): ?string {
+    $name = (string)($model['image_name'] ?? '');
+    if ($name === '' || empty($model['brand_slug']) || empty($model['slug'])) {
+        return null;
+    }
+    $path = MANUALS_DIR . '/' . $model['brand_slug'] . '/' . $model['slug'] . '/' . $name;
+    return is_file($path) ? $path : null;
+}
+
+function model_image_url(array $model): ?string {
+    if (empty($model['image_name'])) return null;
+    return 'model-img.php?id=' . (int)$model['id'];
+}
+
+/** Guarda imagem de capa do modelo. Devolve nome guardado ou null + mensagem em $error. */
+function save_model_image(array $model, array $file, ?string &$error = null): ?string {
+    $error = null;
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        $error = 'Escolhe uma imagem válida.';
+        return null;
+    }
+    if (($file['size'] ?? 0) > 8 * 1024 * 1024) {
+        $error = 'A imagem não pode ultrapassar 8 MB.';
+        return null;
+    }
+    $orig = (string)($file['name'] ?? 'modelo.jpg');
+    $ext = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
+    $allowedExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    if (!in_array($ext, $allowedExt, true)) {
+        $error = 'Usa JPG, PNG, WEBP ou GIF.';
+        return null;
+    }
+    $mime = '';
+    if (class_exists('finfo')) {
+        $mime = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']) ?: '';
+    } elseif (function_exists('mime_content_type')) {
+        $mime = mime_content_type($file['tmp_name']) ?: '';
+    }
+    $okMime = $mime === '' || in_array($mime, [
+        'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/octet-stream',
+    ], true);
+    if (!$okMime) {
+        $error = 'Ficheiro de imagem inválido.';
+        return null;
+    }
+    if ($ext === 'jpeg') $ext = 'jpg';
+    $stored = 'cover-' . bin2hex(random_bytes(8)) . '.' . $ext;
+    $dir = manuals_dir_for($model);
+    // Remove capa anterior
+    if (!empty($model['image_name'])) {
+        $old = $dir . '/' . $model['image_name'];
+        if (is_file($old)) @unlink($old);
+    }
+    if (!move_uploaded_file($file['tmp_name'], $dir . '/' . $stored)) {
+        $error = 'Falha ao guardar a imagem.';
+        return null;
+    }
+    return $stored;
 }
 
 function is_admin_user(?array $user = null): bool {

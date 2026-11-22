@@ -677,7 +677,7 @@ td { border-bottom-color: #ebe4da; }
 
 .folder-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 0.85rem;
 }
 
@@ -694,33 +694,38 @@ td { border-bottom-color: #ebe4da; }
 .folder-main {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.95rem 1rem;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
   text-decoration: none;
   color: inherit;
 }
 
 .folder-main:hover { background: #fafbfc; }
 
-.folder-icon {
-  flex: 0 0 42px;
-  width: 42px;
-  height: 34px;
-  position: relative;
-  border-radius: 4px 4px 3px 3px;
-  background: linear-gradient(180deg, #f0c94a, #d4a017);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
+.folder-photo {
+  flex: 0 0 112px;
+  width: 112px;
+  height: 72px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #eef1f5;
+  display: grid;
+  place-items: center;
 }
 
-.folder-icon::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: -7px;
-  width: 18px;
-  height: 9px;
-  border-radius: 3px 3px 0 0;
-  background: #e0b52f;
+.folder-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.folder-photo--empty {
+  background: linear-gradient(145deg, #2c3340, #1a1f28);
+  color: var(--brand-gold);
+  font-family: "Oswald", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
 .folder-main strong {
@@ -737,9 +742,38 @@ td { border-bottom-color: #ebe4da; }
   color: #8a93a3;
 }
 
-.folder-delete {
-  margin: 0;
+.folder-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   padding: 0 0.85rem 0.75rem;
+}
+
+.folder-delete { margin: 0; }
+
+.folder-image-form { margin: 0; }
+
+.small-file {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 31px;
+  padding: 0 10px;
+  border-radius: 4px;
+  background: #2c3340;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.small-file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .empty-state {
