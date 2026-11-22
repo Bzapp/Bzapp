@@ -12,7 +12,7 @@ function render_head(string $title): void {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=nofondo1">
+<link rel="stylesheet" href="style.css?v=nofondo2">
 <link rel="preload" href="logos/colorido-horizontal.png" as="image">
 </head>
 <body class="app-page">
