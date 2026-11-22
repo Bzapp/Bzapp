@@ -17,11 +17,25 @@ function db(): PDO {
     if ($pdo instanceof PDO) return $pdo;
 
     $dir = dirname(DB_FILE);
-    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+        throw new RuntimeException('Não foi possível criar a pasta data/. Verifica permissões em Tools/data.');
+    }
+    if (!is_writable($dir)) {
+        throw new RuntimeException('A pasta Tools/data não tem permissão de escrita. No Windows, desbloqueia a pasta ou corre o PHP como utilizador normal (não só leitura).');
+    }
 
-    $pdo = new PDO('sqlite:' . DB_FILE);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec('PRAGMA foreign_keys = ON');
+    try {
+        $pdo = new PDO('sqlite:' . DB_FILE);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec('PRAGMA foreign_keys = ON');
+    } catch (PDOException $e) {
+        throw new RuntimeException(
+            'Não foi possível abrir a base SQLite (data/app.sqlite). '
+            . 'Confirma que o PHP tem a extensão pdo_sqlite ativa. Detalhe: ' . $e->getMessage(),
+            (int)$e->getCode(),
+            $e
+        );
+    }
     return $pdo;
 }
 

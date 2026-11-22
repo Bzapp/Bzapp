@@ -1,10 +1,14 @@
 TOOLS / MAF — pacote completo
 
 1. Extrai esta pasta Tools para o Desktop (substitui a pasta antiga).
-2. Abre com PHP (XAMPP/WAMP ou: php -S localhost:8080 router.php).
-3. Login: Bruno (admin) — a base já vem com utilizadores e manuais de teste.
-4. Início = marcas com PNG individuais (como no início, sem sprite).
-5. PDFs em data/manuais/ (Audi A3 8Y + capas de modelos).
-6. Se criares contas novas no servidor, usa setup.php e apaga-o depois.
+2. Abre um terminal DENTRO da pasta Tools e corre:
+     php -S localhost:8080 router.php
+   (Não abras setup.php com duplo-clique no Explorer.)
+3. No browser: http://localhost:8080
+4. Se setup.php disser que a instalação já foi concluída:
+   - entra em http://localhost:8080/index.php
+   - ou apaga data/app.sqlite e volta a abrir setup.php para criar admin novo
+5. Se setup der erro de escrita/SQLite: a pasta data/ tem de ser gravável e o PHP precisa de pdo_sqlite.
+6. PDFs em data/manuais/. Depois de criar o admin, apaga setup.php no servidor.
 
-Nota: app.sqlite e PDFs não ficam no Git; este ZIP é a cópia completa para o PC.
+Nota: app.sqlite e PDFs não ficam no Git; este ZIP pode trazer uma cópia para o PC.
