@@ -152,7 +152,7 @@ render_header($user, 'inicio');
         <iframe
           class="pdf-frame"
           title="<?=h($viewManual['title'])?>"
-          src="pdf.php?id=<?=(int)$viewManual['id']?>#toolbar=0&navpanes=0"
+          src="pdf.php?id=<?=(int)$viewManual['id']?>#toolbar=0&navpanes=0&scrollbar=1&view=FitH"
         ></iframe>
       <?php else: ?>
         <div class="empty-state viewer-empty">Seleciona ou carrega um PDF para visualizar aqui.</div>
