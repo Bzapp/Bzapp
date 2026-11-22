@@ -677,8 +677,9 @@ td { border-bottom-color: #ebe4da; }
 
 .folder-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+  align-items: start;
 }
 
 .folder-card {
@@ -693,10 +694,10 @@ td { border-bottom-color: #ebe4da; }
 
 .folder-main {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.55rem;
-  padding: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem 0.45rem;
   text-decoration: none;
   color: inherit;
 }
@@ -704,11 +705,12 @@ td { border-bottom-color: #ebe4da; }
 .folder-main:hover { background: #fafbfc; }
 
 .folder-photo {
-  width: 100%;
-  height: 132px;
-  border-radius: 0;
+  flex: 0 0 148px;
+  width: 148px;
+  height: 92px;
+  border-radius: 6px;
   overflow: hidden;
-  background: #eef1f5;
+  background: #f3f5f8;
   display: grid;
   place-items: center;
 }
@@ -716,7 +718,8 @@ td { border-bottom-color: #ebe4da; }
 .folder-photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   display: block;
 }
 
@@ -724,12 +727,13 @@ td { border-bottom-color: #ebe4da; }
   background: linear-gradient(145deg, #2c3340, #1a1f28);
   color: var(--brand-gold);
   font-family: "Oswald", sans-serif;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
 .folder-main > span:not(.folder-photo) {
-  padding: 0 0.75rem 0.15rem;
+  padding: 0;
+  min-width: 0;
 }
 
 .folder-main strong {
@@ -749,9 +753,9 @@ td { border-bottom-color: #ebe4da; }
 .folder-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 0.4rem;
-  padding: 0.35rem 0.65rem 0.55rem;
+  padding: 0 0.75rem 0.55rem;
 }
 
 .folder-delete { margin: 0; }
