@@ -127,12 +127,8 @@ function seed_brands(): void {
 function brand_icon_url(string $slug): ?string {
     $file = BRAND_ICONS_DIR . '/' . $slug . '.png';
     if (!is_file($file)) return null;
-    return 'icones_marca/' . rawurlencode($slug) . '.png';
-}
-
-function brand_has_sprite(string $slug): bool {
-    // Ícones individuais existem e estão no sprite.css
-    return is_file(BRAND_ICONS_DIR . '/' . $slug . '.png');
+    $ver = (string)(@filemtime($file) ?: time());
+    return 'icones_marca/' . rawurlencode($slug) . '.png?v=' . rawurlencode($ver);
 }
 
 /** Ordenação A–Z ignorando acentos (Škoda com os S, Citroën com os C, etc.). */

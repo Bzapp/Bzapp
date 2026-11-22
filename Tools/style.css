@@ -634,6 +634,13 @@ td { border-bottom-color: #ebe4da; }
   background: transparent;
 }
 
+.brand-logo img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  display: block;
+}
+
 .brand-card-body {
   display: flex;
   flex-direction: column;

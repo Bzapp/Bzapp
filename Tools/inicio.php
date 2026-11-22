@@ -31,13 +31,6 @@ $brands = db()->query('SELECT b.*, (SELECT COUNT(*) FROM models m WHERE m.brand_
 $brands = sort_brands_alpha($brands);
 
 render_head('Início · Manuais');
-?>
-<?php
-$spriteVer = (string)(@filemtime(__DIR__ . '/icones_marca/sprite.webp') ?: time());
-?>
-<link rel="stylesheet" href="icones_marca/sprite.css?v=<?=h($spriteVer)?>">
-<link rel="preload" href="icones_marca/sprite.webp?v=<?=h($spriteVer)?>" as="image" type="image/webp">
-<?php
 render_header($user, 'inicio');
 ?>
 <main class="page-wrap">
@@ -63,11 +56,13 @@ render_header($user, 'inicio');
 
   <div class="brand-grid">
     <?php foreach ($brands as $brand):
-      $hasSprite = brand_has_sprite($brand['slug']);
+      $icon = brand_icon_url($brand['slug']);
     ?>
       <a class="brand-card" href="marca.php?slug=<?=h(urlencode($brand['slug']))?>">
-        <?php if ($hasSprite): ?>
-        <span class="brand-logo brand-logo--sprite brand-logo--<?=h($brand['slug'])?>" aria-hidden="true"></span>
+        <?php if ($icon): ?>
+        <span class="brand-logo">
+          <img src="<?=h($icon)?>" alt="" width="56" height="56" decoding="async" loading="lazy">
+        </span>
         <?php else: ?>
         <span class="brand-badge" aria-hidden="true"><?=h(strtoupper(substr($brand['name'], 0, 1)))?></span>
         <?php endif; ?>
