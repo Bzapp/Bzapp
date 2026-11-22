@@ -1,0 +1,10 @@
+TOOLS / MAF — pacote completo
+
+1. Extrai esta pasta Tools para o Desktop (substitui a pasta antiga).
+2. Abre com PHP (XAMPP/WAMP ou: php -S localhost:8080 router.php).
+3. Login: Bruno (admin) — a base já vem com utilizadores e manuais de teste.
+4. Início = marcas com PNG individuais (como no início, sem sprite).
+5. PDFs em data/manuais/ (Audi A3 8Y + capas de modelos).
+6. Se criares contas novas no servidor, usa setup.php e apaga-o depois.
+
+Nota: app.sqlite e PDFs não ficam no Git; este ZIP é a cópia completa para o PC.
