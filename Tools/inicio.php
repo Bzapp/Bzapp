@@ -32,8 +32,11 @@ $brands = sort_brands_alpha($brands);
 
 render_head('Início · Manuais');
 ?>
-<link rel="stylesheet" href="icones_marca/sprite.css">
-<link rel="preload" href="icones_marca/sprite.webp" as="image" type="image/webp">
+<?php
+$spriteVer = (string)(@filemtime(__DIR__ . '/icones_marca/sprite.webp') ?: time());
+?>
+<link rel="stylesheet" href="icones_marca/sprite.css?v=<?=h($spriteVer)?>">
+<link rel="preload" href="icones_marca/sprite.webp?v=<?=h($spriteVer)?>" as="image" type="image/webp">
 <?php
 render_header($user, 'inicio');
 ?>
