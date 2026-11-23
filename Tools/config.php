@@ -132,7 +132,7 @@ function seed_brands(): void {
         'Porsche', 'Renault', 'Seat', 'Škoda', 'Smart', 'SsangYong', 'Subaru', 'Suzuki',
         'Tesla', 'Toyota', 'Volkswagen', 'Volvo',
     ];
-    $stmt = $pdo->prepare('INSERT INTO brands (name, slug, sort_order) VALUES (?, ?, ?)');
+    $stmt = $pdo->prepare('INSERT OR IGNORE INTO brands (name, slug, sort_order) VALUES (?, ?, ?)');
     foreach ($names as $i => $name) {
         $stmt->execute([$name, slugify($name), $i + 1]);
     }
@@ -183,15 +183,20 @@ function ensure_seed_brands(): void {
         'Porsche', 'Renault', 'Seat', 'Škoda', 'Smart', 'SsangYong', 'Subaru', 'Suzuki',
         'Tesla', 'Toyota', 'Volkswagen', 'Volvo',
     ];
-    $check = $pdo->prepare('SELECT id FROM brands WHERE slug = ? LIMIT 1');
-    $insert = $pdo->prepare('INSERT INTO brands (name, slug, sort_order) VALUES (?, ?, ?)');
+    $check = $pdo->prepare('SELECT id FROM brands WHERE slug = ? OR name = ? LIMIT 1');
+    $insert = $pdo->prepare('INSERT OR IGNORE INTO brands (name, slug, sort_order) VALUES (?, ?, ?)');
     $max = (int)$pdo->query('SELECT COALESCE(MAX(sort_order), 0) FROM brands')->fetchColumn();
     foreach ($names as $name) {
         $slug = slugify($name);
-        $check->execute([$slug]);
+        $check->execute([$slug, $name]);
         if ($check->fetchColumn()) continue;
         $max++;
-        $insert->execute([$name, $slug, $max]);
+        try {
+            $insert->execute([$name, $slug, $max]);
+        } catch (PDOException $e) {
+            // Base antiga com o mesmo nome/slug — ignora e continua o setup/login.
+            continue;
+        }
     }
 }
 
