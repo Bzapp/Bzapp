@@ -298,6 +298,48 @@ function manuals_dir_for(array $model): string {
     return $dir;
 }
 
+/**
+ * PDFs já na pasta (ex. após 500 no INSERT ou modelo recriado) passam a aparecer na app.
+ * Devolve quantos registos novos foram criados.
+ */
+function sync_manuals_from_disk(array $model): int {
+    $modelId = (int)($model['id'] ?? 0);
+    if ($modelId < 1 || empty($model['brand_slug']) || empty($model['slug'])) {
+        return 0;
+    }
+    $dir = MANUALS_DIR . '/' . $model['brand_slug'] . '/' . $model['slug'];
+    if (!is_dir($dir)) {
+        return 0;
+    }
+
+    $pdo = db();
+    $known = $pdo->prepare('SELECT 1 FROM manuals WHERE model_id = ? AND stored_name = ? LIMIT 1');
+    $insert = $pdo->prepare(
+        'INSERT INTO manuals (model_id, title, stored_name, original_name, uploaded_by) VALUES (?, ?, ?, ?, NULL)'
+    );
+    $added = 0;
+    $n = 0;
+    foreach (glob($dir . '/*.pdf') ?: [] as $path) {
+        if (!is_file($path)) continue;
+        $stored = basename($path);
+        $known->execute([$modelId, $stored]);
+        if ($known->fetchColumn()) continue;
+        $n++;
+        $title = 'Manual ' . $n;
+        // Se o nome original não for o hash hex, usa-o como título
+        if (!preg_match('/^[a-f0-9]{16,}\.pdf$/i', $stored)) {
+            $title = pathinfo($stored, PATHINFO_FILENAME);
+        }
+        try {
+            $insert->execute([$modelId, $title, $stored, $stored]);
+            $added++;
+        } catch (PDOException $e) {
+            continue;
+        }
+    }
+    return $added;
+}
+
 function model_image_path(array $model): ?string {
     $name = (string)($model['image_name'] ?? '');
     if ($name === '' || empty($model['brand_slug']) || empty($model['slug'])) {

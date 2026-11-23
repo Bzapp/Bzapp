@@ -15,6 +15,18 @@ $success = '';
 $error = '';
 $viewId = (int)($_GET['ver'] ?? 0);
 
+// PDFs na pasta sem linha na BD (ex. upload com 500) → reassocia
+try {
+    $synced = sync_manuals_from_disk($model);
+    if ($synced > 0) {
+        $success = $synced === 1
+            ? '1 manual da pasta foi associado a este modelo.'
+            : $synced . ' manuais da pasta foram associados a este modelo.';
+    }
+} catch (Throwable $e) {
+    // Não bloqueia a página se a pasta falhar
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_admin_user($user)) {
     try {
         verify_csrf();

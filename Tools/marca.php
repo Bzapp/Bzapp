@@ -106,6 +106,22 @@ $models->execute([(int)$brand['id']]);
 $models = $models->fetchAll(PDO::FETCH_ASSOC);
 foreach ($models as &$m) {
     $m['brand_slug'] = $brand['slug'];
+    try {
+        sync_manuals_from_disk($m);
+    } catch (Throwable $e) {
+        // ignora pasta inacessível
+    }
+}
+unset($m);
+// Contagens depois do sync
+$models = db()->prepare(
+    'SELECT m.*, (SELECT COUNT(*) FROM manuals x WHERE x.model_id = m.id) AS pdf_count
+     FROM models m WHERE m.brand_id = ? ORDER BY m.name COLLATE NOCASE'
+);
+$models->execute([(int)$brand['id']]);
+$models = $models->fetchAll(PDO::FETCH_ASSOC);
+foreach ($models as &$m) {
+    $m['brand_slug'] = $brand['slug'];
 }
 unset($m);
 
