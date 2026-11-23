@@ -16,55 +16,67 @@ $error = '';
 $viewId = (int)($_GET['ver'] ?? 0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_admin_user($user)) {
-    verify_csrf();
-    $action = $_POST['action'] ?? '';
+    try {
+        verify_csrf();
+        $action = $_POST['action'] ?? '';
 
-    if ($action === 'upload_pdf') {
-        $title = trim((string)($_POST['title'] ?? ''));
-        $file = $_FILES['pdf'] ?? null;
-        if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-            $error = 'Escolhe um ficheiro PDF válido.';
-        } else {
-            $orig = (string)($file['name'] ?? 'manual.pdf');
-            $ext = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
-            $mime = '';
-            if (class_exists('finfo')) {
-                $mime = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']) ?: '';
-            } elseif (function_exists('mime_content_type')) {
-                $mime = mime_content_type($file['tmp_name']) ?: '';
-            }
-            $okMime = $mime === '' || in_array($mime, ['application/pdf', 'application/x-pdf', 'application/octet-stream'], true);
-            if ($ext !== 'pdf' || !$okMime) {
-                $error = 'Só são aceites ficheiros PDF.';
-            } elseif (($file['size'] ?? 0) > 40 * 1024 * 1024) {
-                $error = 'O PDF não pode ultrapassar 40 MB.';
+        if ($action === 'upload_pdf') {
+            $title = trim((string)($_POST['title'] ?? ''));
+            $file = $_FILES['pdf'] ?? null;
+            $uploadErr = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
+            if (!$file || $uploadErr !== UPLOAD_ERR_OK) {
+                $error = match ($uploadErr) {
+                    UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'O PDF é demasiado grande para o limite do PHP no hosting (sobe upload_max_filesize / post_max_size no cPanel).',
+                    UPLOAD_ERR_PARTIAL => 'O envio do PDF ficou incompleto. Tenta outra vez.',
+                    UPLOAD_ERR_NO_FILE => 'Escolhe um ficheiro PDF.',
+                    UPLOAD_ERR_NO_TMP_DIR => 'O servidor não tem pasta temporária para uploads.',
+                    UPLOAD_ERR_CANT_WRITE => 'O PHP não conseguiu escrever o ficheiro temporário.',
+                    default => 'Escolhe um ficheiro PDF válido (erro de upload #' . $uploadErr . ').',
+                };
             } else {
-                if ($title === '') $title = pathinfo($orig, PATHINFO_FILENAME);
-                $stored = bin2hex(random_bytes(16)) . '.pdf';
-                $dir = manuals_dir_for($model);
-                if (!move_uploaded_file($file['tmp_name'], $dir . '/' . $stored)) {
-                    $error = 'Falha ao guardar o PDF.';
+                $orig = (string)($file['name'] ?? 'manual.pdf');
+                $ext = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
+                $mime = '';
+                if (class_exists('finfo')) {
+                    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']) ?: '';
+                } elseif (function_exists('mime_content_type')) {
+                    $mime = mime_content_type($file['tmp_name']) ?: '';
+                }
+                $okMime = $mime === '' || in_array($mime, ['application/pdf', 'application/x-pdf', 'application/octet-stream'], true);
+                if ($ext !== 'pdf' || !$okMime) {
+                    $error = 'Só são aceites ficheiros PDF.';
+                } elseif (($file['size'] ?? 0) > 40 * 1024 * 1024) {
+                    $error = 'O PDF não pode ultrapassar 40 MB.';
                 } else {
-                    $stmt = db()->prepare('INSERT INTO manuals (model_id, title, stored_name, original_name, uploaded_by) VALUES (?, ?, ?, ?, ?)');
-                    $stmt->execute([(int)$model['id'], $title, $stored, $orig, (int)$user['id']]);
-                    $success = 'PDF adicionado.';
+                    if ($title === '') $title = pathinfo($orig, PATHINFO_FILENAME);
+                    $stored = bin2hex(random_bytes(16)) . '.pdf';
+                    $dir = manuals_dir_for($model);
+                    if (!move_uploaded_file($file['tmp_name'], $dir . '/' . $stored)) {
+                        $error = 'Falha ao guardar o PDF. Confirma que Tools/data/manuais é gravável (755/775).';
+                    } else {
+                        $stmt = db()->prepare('INSERT INTO manuals (model_id, title, stored_name, original_name, uploaded_by) VALUES (?, ?, ?, ?, ?)');
+                        $stmt->execute([(int)$model['id'], $title, $stored, $orig, (int)$user['id']]);
+                        $success = 'PDF adicionado.';
+                    }
                 }
             }
         }
-    }
 
-    if ($action === 'delete_pdf') {
-        $id = (int)($_POST['manual_id'] ?? 0);
-        $stmt = db()->prepare('SELECT * FROM manuals WHERE id = ? AND model_id = ?');
-        $stmt->execute([$id, (int)$model['id']]);
-        $manual = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($manual) {
-            $path = manuals_dir_for($model) . '/' . $manual['stored_name'];
-            if (is_file($path)) @unlink($path);
-            db()->prepare('DELETE FROM manuals WHERE id = ?')->execute([$id]);
-            $success = 'PDF eliminado.';
-            if ($viewId === $id) $viewId = 0;
+        if ($action === 'delete_pdf') {
+            $id = (int)($_POST['manual_id'] ?? 0);
+            $stmt = db()->prepare('SELECT * FROM manuals WHERE id = ? AND model_id = ?');
+            $stmt->execute([$id, (int)$model['id']]);
+            $manual = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($manual) {
+                $path = manuals_dir_for($model) . '/' . $manual['stored_name'];
+                if (is_file($path)) @unlink($path);
+                db()->prepare('DELETE FROM manuals WHERE id = ?')->execute([$id]);
+                $success = 'PDF eliminado.';
+                if ($viewId === $id) $viewId = 0;
+            }
         }
+    } catch (Throwable $e) {
+        $error = 'Erro ao processar o PDF: ' . $e->getMessage();
     }
 }
 

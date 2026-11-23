@@ -283,9 +283,17 @@ function model_by_slugs(string $brandSlug, string $modelSlug): ?array {
 }
 
 function manuals_dir_for(array $model): string {
-    $dir = MANUALS_DIR . '/' . $model['brand_slug'] . '/' . $model['slug'];
-    if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
+    $brand = preg_replace('/[^a-z0-9_-]+/i', '', (string)($model['brand_slug'] ?? '')) ?: 'marca';
+    $slug = preg_replace('/[^a-z0-9_-]+/i', '', (string)($model['slug'] ?? '')) ?: 'modelo';
+    if (!is_dir(MANUALS_DIR) && !@mkdir(MANUALS_DIR, 0755, true) && !is_dir(MANUALS_DIR)) {
+        throw new RuntimeException('Não foi possível criar Tools/data/manuais. No cPanel define permissões 755/775 em data/.');
+    }
+    $dir = MANUALS_DIR . '/' . $brand . '/' . $slug;
+    if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+        throw new RuntimeException('Não foi possível criar a pasta do modelo em data/manuais. Verifica permissões de escrita.');
+    }
+    if (!is_writable($dir)) {
+        throw new RuntimeException('A pasta data/manuais não é gravável. No cPanel: data/ e data/manuais → 755 ou 775.');
     }
     return $dir;
 }
