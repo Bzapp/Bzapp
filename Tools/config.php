@@ -135,7 +135,7 @@ function brand_icon_slug_candidates(string $slug): array {
     if ($slug !== '') $out[] = $slug;
     if (isset($aliases[$slug])) $out[] = $aliases[$slug];
     // Heurística: slug que perdeu o S inicial de Škoda
-    if ($slug === 'koda' || str_ends_with($slug, 'koda')) {
+    if ($slug === 'koda' || substr($slug, -4) === 'koda') {
         $out[] = 'skoda';
     }
     return array_values(array_unique($out));
@@ -153,10 +153,10 @@ function repair_brand_slugs(): void {
         $nameLower = function_exists('mb_strtolower')
             ? mb_strtolower((string)$row['name'], 'UTF-8')
             : strtolower((string)$row['name']);
-        if (str_contains($nameLower, 'koda') || str_contains($nameLower, 'škoda')) {
+        if (strpos($nameLower, 'koda') !== false || strpos($nameLower, 'škoda') !== false) {
             $want = 'skoda';
         }
-        if (str_contains($nameLower, 'citro')) {
+        if (strpos($nameLower, 'citro') !== false) {
             $want = 'citroen';
         }
         if ($want === '' || $want === (string)$row['slug']) continue;
@@ -467,4 +467,14 @@ function h(string $value): string {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-init_db();
+try {
+    init_db();
+} catch (Throwable $e) {
+    http_response_code(500);
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!doctype html><meta charset="utf-8"><title>Erro Tools</title>';
+    echo '<p><strong>Erro ao iniciar a base de dados:</strong> ';
+    echo htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+    echo '</p><p>No cPanel confirma: pasta <code>data/</code> gravável (755/775) e PHP com <code>pdo_sqlite</code>.</p>';
+    exit;
+}

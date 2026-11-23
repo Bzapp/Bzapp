@@ -37,14 +37,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_admin_user($user)) {
             $file = $_FILES['pdf'] ?? null;
             $uploadErr = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
             if (!$file || $uploadErr !== UPLOAD_ERR_OK) {
-                $error = match ($uploadErr) {
-                    UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'O PDF é demasiado grande para o limite do PHP no hosting (sobe upload_max_filesize / post_max_size no cPanel).',
-                    UPLOAD_ERR_PARTIAL => 'O envio do PDF ficou incompleto. Tenta outra vez.',
-                    UPLOAD_ERR_NO_FILE => 'Escolhe um ficheiro PDF.',
-                    UPLOAD_ERR_NO_TMP_DIR => 'O servidor não tem pasta temporária para uploads.',
-                    UPLOAD_ERR_CANT_WRITE => 'O PHP não conseguiu escrever o ficheiro temporário.',
-                    default => 'Escolhe um ficheiro PDF válido (erro de upload #' . $uploadErr . ').',
-                };
+                if ($uploadErr === UPLOAD_ERR_INI_SIZE || $uploadErr === UPLOAD_ERR_FORM_SIZE) {
+                    $error = 'O PDF é demasiado grande para o limite do PHP no hosting (sobe upload_max_filesize / post_max_size no cPanel).';
+                } elseif ($uploadErr === UPLOAD_ERR_PARTIAL) {
+                    $error = 'O envio do PDF ficou incompleto. Tenta outra vez.';
+                } elseif ($uploadErr === UPLOAD_ERR_NO_FILE) {
+                    $error = 'Escolhe um ficheiro PDF.';
+                } elseif ($uploadErr === UPLOAD_ERR_NO_TMP_DIR) {
+                    $error = 'O servidor não tem pasta temporária para uploads.';
+                } elseif ($uploadErr === UPLOAD_ERR_CANT_WRITE) {
+                    $error = 'O PHP não conseguiu escrever o ficheiro temporário.';
+                } else {
+                    $error = 'Escolhe um ficheiro PDF válido (erro de upload #' . $uploadErr . ').';
+                }
             } else {
                 $orig = (string)($file['name'] ?? 'manual.pdf');
                 $ext = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
