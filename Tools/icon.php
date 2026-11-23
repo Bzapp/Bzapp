@@ -6,23 +6,23 @@ require __DIR__ . '/config.php';
 
 require_login();
 
-$slug = slugify((string)($_GET['slug'] ?? ''));
+$raw = (string)($_GET['slug'] ?? '');
+$slug = slugify($raw);
+if ($slug === '' && $raw !== '') {
+    $slug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $raw) ?? '');
+    $slug = trim($slug, '-');
+}
 if ($slug === '') {
     http_response_code(400);
     exit('Slug em falta.');
 }
 
-$file = BRAND_ICONS_DIR . '/' . $slug . '.png';
-if (!is_file($file)) {
-    foreach (glob(BRAND_ICONS_DIR . '/*.png') ?: [] as $path) {
-        if (strtolower(basename($path, '.png')) === strtolower($slug)) {
-            $file = $path;
-            break;
-        }
-    }
+$file = brand_icon_file($slug);
+if ($file === null && $raw !== '') {
+    $file = brand_icon_file($raw);
 }
 
-if (!is_file($file)) {
+if ($file === null || !is_file($file)) {
     http_response_code(404);
     header('Content-Type: text/plain; charset=utf-8');
     exit('Ícone não encontrado: ' . $slug);

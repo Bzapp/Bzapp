@@ -102,21 +102,72 @@ function init_db(): void {
     ");
     seed_brands();
     ensure_seed_brands();
+    repair_brand_slugs();
 }
 
 function slugify(string $text): string {
+    // Mapa ANTES do iconv: em alguns cPanel o //IGNORE apaga Š/ë e "Škoda" vira "koda".
+    $map = [
+        'Á'=>'A','À'=>'A','Ã'=>'A','Â'=>'A','Ä'=>'A','Å'=>'A','É'=>'E','Ê'=>'E','Ë'=>'E','Í'=>'I','Ó'=>'O','Ô'=>'O','Õ'=>'O','Ö'=>'O','Ú'=>'U','Ü'=>'U','Ç'=>'C','Ñ'=>'N','Š'=>'S','Ž'=>'Z','Č'=>'C','Ć'=>'C','Đ'=>'D','Ř'=>'R',
+        'á'=>'a','à'=>'a','ã'=>'a','â'=>'a','ä'=>'a','å'=>'a','é'=>'e','ê'=>'e','ë'=>'e','í'=>'i','ó'=>'o','ô'=>'o','õ'=>'o','ö'=>'o','ú'=>'u','ü'=>'u','ç'=>'c','ñ'=>'n','š'=>'s','ž'=>'z','č'=>'c','ć'=>'c','đ'=>'d','ř'=>'r',
+    ];
+    $text = strtr($text, $map);
     if (function_exists('iconv')) {
         $converted = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
         if ($converted !== false) $text = $converted;
     }
-    $map = [
-        'Á'=>'A','À'=>'A','Ã'=>'A','Â'=>'A','Ä'=>'A','É'=>'E','Ê'=>'E','Í'=>'I','Ó'=>'O','Ô'=>'O','Õ'=>'O','Ö'=>'O','Ú'=>'U','Ü'=>'U','Ç'=>'C','Ñ'=>'N','Š'=>'S',
-        'á'=>'a','à'=>'a','ã'=>'a','â'=>'a','ä'=>'a','é'=>'e','ê'=>'e','í'=>'i','ó'=>'o','ô'=>'o','õ'=>'o','ö'=>'o','ú'=>'u','ü'=>'u','ç'=>'c','ñ'=>'n','š'=>'s',
-    ];
-    $text = strtr($text, $map);
     $text = strtolower($text);
     $text = preg_replace('/[^a-z0-9]+/', '-', $text) ?? '';
     return trim($text, '-') ?: 'item';
+}
+
+/** Aliases de ficheiros PNG quando o slug antigo no servidor ficou errado (ex. koda → skoda). */
+function brand_icon_slug_candidates(string $slug): array {
+    $slug = strtolower(trim($slug));
+    $aliases = [
+        'koda' => 'skoda',
+        'skoda' => 'skoda',
+        'citroen' => 'citroen',
+        'citron' => 'citroen',
+        'citroën' => 'citroen',
+    ];
+    $out = [];
+    if ($slug !== '') $out[] = $slug;
+    if (isset($aliases[$slug])) $out[] = $aliases[$slug];
+    // Heurística: slug que perdeu o S inicial de Škoda
+    if ($slug === 'koda' || str_ends_with($slug, 'koda')) {
+        $out[] = 'skoda';
+    }
+    return array_values(array_unique($out));
+}
+
+/** Corrige slugs gravados mal (Škoda→koda) para bater certo com icones_marca/*.png. */
+function repair_brand_slugs(): void {
+    $pdo = db();
+    $rows = $pdo->query('SELECT id, name, slug FROM brands')->fetchAll(PDO::FETCH_ASSOC);
+    $upd = $pdo->prepare('UPDATE brands SET slug = ? WHERE id = ?');
+    $exists = $pdo->prepare('SELECT id FROM brands WHERE slug = ? AND id != ? LIMIT 1');
+    foreach ($rows as $row) {
+        $want = slugify((string)$row['name']);
+        // Forçar marcas conhecidas com acentos
+        $nameLower = function_exists('mb_strtolower')
+            ? mb_strtolower((string)$row['name'], 'UTF-8')
+            : strtolower((string)$row['name']);
+        if (str_contains($nameLower, 'koda') || str_contains($nameLower, 'škoda')) {
+            $want = 'skoda';
+        }
+        if (str_contains($nameLower, 'citro')) {
+            $want = 'citroen';
+        }
+        if ($want === '' || $want === (string)$row['slug']) continue;
+        $exists->execute([$want, (int)$row['id']]);
+        if ($exists->fetchColumn()) continue;
+        try {
+            $upd->execute([$want, (int)$row['id']]);
+        } catch (PDOException $e) {
+            continue;
+        }
+    }
 }
 
 function seed_brands(): void {
@@ -139,11 +190,20 @@ function seed_brands(): void {
 }
 
 function brand_icon_file(string $slug): ?string {
-    $file = BRAND_ICONS_DIR . '/' . $slug . '.png';
-    if (is_file($file)) return $file;
+    $candidates = brand_icon_slug_candidates(slugify($slug));
+    // Também tenta o slug cru (bases antigas) e aliases diretos
+    foreach (brand_icon_slug_candidates($slug) as $c) {
+        $candidates[] = $c;
+    }
+    $candidates = array_values(array_unique($candidates));
+    foreach ($candidates as $c) {
+        $file = BRAND_ICONS_DIR . '/' . $c . '.png';
+        if (is_file($file)) return $file;
+    }
     foreach (glob(BRAND_ICONS_DIR . '/*.png') ?: [] as $path) {
-        if (strtolower(basename($path, '.png')) === strtolower($slug)) {
-            return $path;
+        $base = strtolower(basename($path, '.png'));
+        foreach ($candidates as $c) {
+            if ($base === strtolower($c)) return $path;
         }
     }
     return null;
@@ -153,8 +213,10 @@ function brand_icon_url(string $slug): ?string {
     $file = brand_icon_file($slug);
     if ($file === null) return null;
     $ver = (string)(@filemtime($file) ?: 0);
+    // Usa o nome real do ficheiro (skoda) — não o slug antigo (koda)
+    $fileSlug = strtolower(basename($file, '.png'));
     // Via PHP: contorna cache estática / FTP / case no hosting
-    return 'icon.php?slug=' . rawurlencode($slug) . '&v=' . rawurlencode($ver);
+    return 'icon.php?slug=' . rawurlencode($fileSlug) . '&v=' . rawurlencode($ver);
 }
 
 /** Inicial da marca sem partir UTF-8 (Škoda → S). */
