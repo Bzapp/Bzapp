@@ -1,0 +1,12 @@
+TOOLS / MAF — no PC (Desktop\Tools)
+
+1. Extrai o ZIP para Desktop\Tools
+2. Duplo-clique em start.bat
+3. Browser abre http://localhost:8080
+4. Se setup disser que já está concluído:
+   - clica "Ir para o login", ou
+   - em setup.php usa "Recriar instalação" e cria um admin novo
+5. Alternativa: reset-admin.bat (apaga data\app.sqlite) e volta ao setup
+6. Precisas de PHP no PATH (XAMPP/WAMP) com pdo_sqlite
+
+Não abras os ficheiros .php com duplo-clique no Explorer.

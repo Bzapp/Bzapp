@@ -1,0 +1,15 @@
+BP POWER CAR SERVICE — Tools (servidor cPanel)
+
+INSTALAÇÃO COMPLETA
+1. cPanel → Gestor de ficheiros → public_html (ou pasta do domínio).
+2. Upload de Tools-servidor.zip → Extrair.
+3. Fica a pasta Tools/ com tudo dentro.
+4. Clique direito em Tools/data → Permissões → 755 ou 775 (gravável).
+5. PHP com pdo_sqlite (Seleccionar versão do PHP → Extensões).
+6. Browser: https://SEU-DOMINIO/Tools/setup.php
+7. Cria o administrador.
+8. Apaga Tools/setup.php no servidor.
+9. Entra: https://SEU-DOMINIO/Tools/index.php
+
+Este pacote já inclui o fix do erro UNIQUE brands.name.
+Não uses start.bat — isso é só para PC local.

@@ -1,0 +1,5 @@
+Tools/data/app.sqlite
+Tools/data/*.sqlite
+Tools/data/manuais/**
+!Tools/data/manuais/.htaccess
+!Tools/data/manuais/.gitkeep
